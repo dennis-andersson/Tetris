@@ -3,7 +3,7 @@
 
 int main()
 {
-	sf::RenderWindow window(sf::VideoMode(640, 480), "Tetris");
+	sf::RenderWindow window(sf::VideoMode(724, 774), "Tetris");
 
 	while (window.isOpen()) {
 		sf::Event event;
