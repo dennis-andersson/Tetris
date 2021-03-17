@@ -28,10 +28,15 @@ public:
 		highScores.readHighScores();
 	}
 
+	void myMethod()
+	{
+
+	}
+
 	void Run()
 	{
 		sf::RenderWindow window(sf::VideoMode(WindowWidth, WindowHeight), "Tetris");
-
+		
 		while (window.isOpen()) {
 			sf::Event event;
 
