@@ -19,9 +19,11 @@ public:
 		tetris = (rowsCleared == 4);
 
 		if (multipleTetris)
-			score += (3 * points[rowsCleared]) * level;
+			score += (3 * points[rowsCleared - 1]) * level;
 		else
-			score += points[rowsCleared] * level;
+			score += points[rowsCleared - 1] * level;
+
+		// TODO: Play a sound effect based on the number of rows cleared.
 	}
 };
 

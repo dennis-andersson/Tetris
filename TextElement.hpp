@@ -65,6 +65,11 @@ public:
 		visible = !visible;
 	}
 
+	void setVisible(bool Visible)
+	{
+		visible = Visible;
+	}
+
 	bool isVisible()
 	{
 		return visible;

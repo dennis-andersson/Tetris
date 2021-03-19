@@ -2,8 +2,7 @@
 
 class Level
 {
-	int levelLimit{ 1500 };
-	//int levelLimit{ 50 };
+	int levelLimit{ 1000 };
 	int currentLevel;
 public:
 	Level()

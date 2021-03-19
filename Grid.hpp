@@ -141,4 +141,9 @@ public:
 	{
 		return visibleLines[row];
 	}
+
+	void setVisible(int row, bool visible)
+	{
+		visibleLines[row] = visible;
+	}
 };
