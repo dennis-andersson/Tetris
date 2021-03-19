@@ -166,16 +166,21 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Border.hpp" />
     <ClInclude Include="CreditsScreen.hpp" />
+    <ClInclude Include="Direction.hpp" />
     <ClInclude Include="Game.hpp" />
+    <ClInclude Include="Grid.hpp" />
     <ClInclude Include="HighScoreTable.hpp" />
     <ClInclude Include="HighScoreTableScreen.hpp" />
     <ClInclude Include="Level.hpp" />
     <ClInclude Include="LevelSelectionScreen.hpp" />
     <ClInclude Include="MenuScreen.hpp" />
-    <ClInclude Include="PlayScreen.hpp" />
+    <ClInclude Include="GameScreen.hpp" />
+    <ClInclude Include="Score.hpp" />
     <ClInclude Include="Screen.hpp" />
     <ClInclude Include="Tetromino.hpp" />
+    <ClInclude Include="TextElement.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
