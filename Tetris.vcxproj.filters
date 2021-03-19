@@ -38,9 +38,6 @@
     <ClInclude Include="LevelSelectionScreen.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PlayScreen.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="HighScoreTableScreen.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -48,6 +45,24 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Tetromino.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GameScreen.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TextElement.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Grid.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Score.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Border.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Direction.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
