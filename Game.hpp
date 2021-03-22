@@ -381,7 +381,7 @@ public:
 
 		sf::Sound sound;
 		sound.setBuffer(buffer);
-		sound.play();
+		//sound.play();
 
 		while (true) {
 			// TODO: Play some music to entertain the player.
