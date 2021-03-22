@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <array>
 #include <vector>
 #include <stack>
@@ -372,6 +373,15 @@ public:
 	void newGame()
 	{
 		sf::RenderWindow window(sf::VideoMode(WindowWidth, WindowHeight), "Tetris");
+
+		sf::SoundBuffer buffer;
+		if (!buffer.loadFromFile("sounds/pause.wav")) {
+			return;
+		}
+
+		sf::Sound sound;
+		sound.setBuffer(buffer);
+		sound.play();
 
 		while (true) {
 			// TODO: Play some music to entertain the player.
