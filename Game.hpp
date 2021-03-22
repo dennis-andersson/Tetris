@@ -208,7 +208,7 @@ public:
 
 		while (window.isOpen()) {
 			if (!GameOver) {
-				sf::Time trigger{ sf::seconds(85.f / (85.f + (currentLevel.getLevel() * (currentLevel.getLevel() * 5.f)))) };
+				sf::Time trigger{ currentLevel.getLevelSpeed() };
 				deltaTime = clock.restart();
 				elapsedTime += deltaTime;
 
@@ -309,6 +309,11 @@ public:
 					break;
 				case sf::Keyboard::Up:
 					rotate();
+					break;
+				case sf::Keyboard::A:
+					// DEBUG
+					currentScore.addSoftScore(1200);
+					currentLevel.nextLevel(currentScore.score);
 					break;
 				}
 			}
