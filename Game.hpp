@@ -133,7 +133,7 @@ private:
 	void newShape(Tetromino& shape, sf::Vector2i position, int newId)
 	{
 		shape.newShape(newId);
-		shape.setBlocksSprite(blocks[currentShape.getId()]);
+		shape.setBlocksSprite(blocks[newId]);
 		shape.setPosition(position);
 	}
 
