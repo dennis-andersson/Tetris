@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <array>
 #include <vector>
 #include <stack>
@@ -133,7 +134,7 @@ private:
 	void newShape(Tetromino& shape, sf::Vector2i position, int newId)
 	{
 		shape.newShape(newId);
-		shape.setBlocksSprite(blocks[currentShape.getId()]);
+		shape.setBlocksSprite(blocks[newId]);
 		shape.setPosition(position);
 	}
 
@@ -208,7 +209,7 @@ public:
 
 		while (window.isOpen()) {
 			if (!GameOver) {
-				sf::Time trigger{ sf::seconds(85.f / (85.f + (currentLevel.getLevel() * (currentLevel.getLevel() * 5.f)))) };
+				sf::Time trigger{ currentLevel.getLevelSpeed() };
 				deltaTime = clock.restart();
 				elapsedTime += deltaTime;
 
@@ -310,6 +311,11 @@ public:
 				case sf::Keyboard::Up:
 					rotate();
 					break;
+				case sf::Keyboard::A:
+					// DEBUG
+					currentScore.addSoftScore(1200);
+					currentLevel.nextLevel(currentScore.score);
+					break;
 				}
 			}
 
@@ -367,6 +373,15 @@ public:
 	void newGame()
 	{
 		sf::RenderWindow window(sf::VideoMode(WindowWidth, WindowHeight), "Tetris");
+
+		sf::SoundBuffer buffer;
+		if (!buffer.loadFromFile("sounds/pause.wav")) {
+			return;
+		}
+
+		sf::Sound sound;
+		sound.setBuffer(buffer);
+		sound.play();
 
 		while (true) {
 			// TODO: Play some music to entertain the player.
