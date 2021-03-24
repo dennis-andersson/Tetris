@@ -239,10 +239,16 @@ public:
 	}
 
 	void update(const sf::Time& elapsedTime, const sf::Time& deltaTime) {
+		if (direction != Direction::None)
+			moveShape(direction);
+
+		if (rotateShape)
+			rotate();
+
 		grid.update(deltaTime);
 
 		if (!currentShape.isVisible()) {
-			if (grid.isToRemoveBlocks())
+			if (grid.aboutToRemoveBlocks())
 				return;
 			newShapes();
 		}
@@ -290,26 +296,34 @@ public:
 		return true;
 	}
 
+	Direction direction;
+	bool rotateShape{ false };
+	float dpadX, dpadY;
+	float limit{ 15.f };
+	float delta{ 0.2f };
+	float X, Y;
+
 	void processEvents(sf::RenderWindow &window) {
 		sf::Event event;
-		bool move;
 
+		rotateShape = false;
+		direction = Direction::None;
 		while (window.pollEvent(event)) {
 			if (event.type == sf::Event::Closed) {
 				window.close();
 			} else if (event.type == sf::Event::KeyPressed) {
 				switch (event.key.code) {
 				case sf::Keyboard::Left:
-					moveShape(Direction::Left);
+					direction = Direction::Left;
 					break;
 				case sf::Keyboard::Right:
-					moveShape(Direction::Right);
+					direction = Direction::Right;
 					break;
 				case sf::Keyboard::Down:
-					moveShape(Direction::SoftDown);
+					direction = Direction::SoftDown;
 					break;
 				case sf::Keyboard::Up:
-					rotate();
+					rotateShape = true;
 					break;
 				case sf::Keyboard::A:
 					// DEBUG
@@ -319,39 +333,29 @@ public:
 				}
 			}
 
-			if (event.type == sf::Event::JoystickMoved) {
-				float X = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::X);
-				float Y = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Y);
+			if (sf::Joystick::isConnected(0)) {
+				bool buttonPressed = gamepadButtonPressed();
 
-				// Left stick
-				//  X > 0	Right
-				//	X < 0	Left
-				//	Y < 0	Up
-				//	Y > 0	Down
+				if (buttonPressed)
+					rotateShape = true;
 
-				// Right Stick
-				// U > 0	Right
-				// U < 0	Left
-				// V < 0	Up
-				// V > 0	Down
+				X = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::X);
+				Y = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Y);
 
-				float limit{ 50.f };
-				if (X > limit)
-					moveShape(Direction::Right);
-				if (X < -limit)
-					moveShape(Direction::Left);
-				if (Y > limit)
-					moveShape(Direction::SoftDown);
+				dpadX = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::PovX);
+				dpadY = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::PovY);
+
+				if (dpadX > 0.5f)	direction = Direction::Right;
+				if (dpadX < -0.5f)	direction = Direction::Left;
+				if (dpadY < -0.5f)	direction = Direction::SoftDown;
+				if (dpadY > 0.5f)	rotateShape = true;
+
+				if (X > limit)	direction = Direction::Right;
+				if (X < -limit)	direction = Direction::Left;
+				if (Y > limit)	direction = Direction::SoftDown;
+				if (Y < -limit)	rotateShape = true;
 			}
 		}
-
-		if (sf::Joystick::isConnected(0))
-		{
-			bool buttonPressed = gamepadButtonPressed();
-			if (buttonPressed)
-				rotate();
-		}
-
 	}
 
 	void rotate() {
