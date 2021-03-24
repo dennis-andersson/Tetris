@@ -16,6 +16,11 @@
 const int blockTypes{ 7 };
 const int blockLength{ 4 };
 
+enum BlockNames
+{
+	Square = 0, ReverseL, Z, ReverseZ, T, L, I
+};
+	
 unsigned int BlockInfo[blockTypes][blockLength] = {
 	{4, 5,  8,  9},     // Square
 	{5, 9, 13,  12},    // Reverse-L
@@ -89,10 +94,10 @@ public:
 		//store state of Block in case rotation turns out to be invalid
 		oldBlock = block;
 
-		if (id == 0) //square: no need for rotation
+		if (id == BlockNames::Square) //square: no need for rotation
 			return;
 
-		if (id == 6) { // I: restrict "rotation" to two states (horizontal/vertical)
+		if (id == BlockNames::I) { // I: restrict "rotation" to two states (horizontal/vertical)
 			currentRotation++;
 			for (auto i = 0; i < 4; ++i) {
 				sf::Vector2i oldPoint = block[i];    //pivot

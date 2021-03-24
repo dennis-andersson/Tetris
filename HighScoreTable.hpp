@@ -28,6 +28,7 @@ struct HighScore
 
 class HighScoreTable
 {
+	std::string filename{ "highscores.dat" };
 public:
 	std::vector<HighScore> HighScores;
 

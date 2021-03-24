@@ -74,7 +74,7 @@ public:
 
 	int markLinesForRemoval()
 	{
-		if (isToRemoveBlocks())
+		if (aboutToRemoveBlocks())
 			return linesToRemove.size();
 
 		for (int row = height - 1; row >= 0; --row) {
@@ -111,14 +111,14 @@ public:
 		linesToRemove.clear();
 	}
 
-	inline bool isToRemoveBlocks() const
+	inline bool aboutToRemoveBlocks() const
 	{
 		return !linesToRemove.empty();
 	}
 
 	void update(const sf::Time& deltaTime) {
 		markLinesForRemoval();
-		if (isToRemoveBlocks()) {
+		if (aboutToRemoveBlocks()) {
 			elapsedTime += deltaTime.asSeconds();
 			blink();
 			if (elapsedTime > 0.6f) {
