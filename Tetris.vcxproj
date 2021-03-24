@@ -179,6 +179,7 @@
     <ClInclude Include="GameScreen.hpp" />
     <ClInclude Include="Score.hpp" />
     <ClInclude Include="Screen.hpp" />
+    <ClInclude Include="Sound.hpp" />
     <ClInclude Include="Tetromino.hpp" />
     <ClInclude Include="TextElement.hpp" />
   </ItemGroup>

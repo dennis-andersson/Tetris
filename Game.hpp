@@ -17,6 +17,7 @@
 #include "Score.hpp"
 #include "Border.hpp"
 #include "Direction.hpp"
+#include "Sound.hpp"
 
 class Game
 {
@@ -58,6 +59,8 @@ private:
 	int linesCleared{ 0 };
 	Level currentLevel;
 	bool GameOver;
+
+	Sound sound;
 
 	std::default_random_engine engine{ static_cast<unsigned int>(std::chrono::system_clock::now().time_since_epoch().count()) };
 
@@ -123,6 +126,8 @@ private:
 		currentShape.setOffset(borderPosition);
 		newShape(currentShape, shapeFirstPosition);
 		newShape(nextShape, nextShapePosition);
+
+		// TODO: Load sound effects
 	}
 
 	void newShapes()
