@@ -50,7 +50,8 @@ public:
 		}
 	}
 
-	std::array<sf::Vector2i, 4> getBlockPositions() const {
+	std::array<sf::Vector2i, 4> getBlockPositions() const
+	{
 		return getBlockPositions(block, position);
 	}
 
@@ -90,7 +91,8 @@ public:
 		}
 	}
 
-	void rotate() {
+	void rotate()
+	{
 		//store state of Block in case rotation turns out to be invalid
 		oldBlock = block;
 
@@ -134,10 +136,10 @@ public:
 		}
 	}
 
-	void revertState() {
+	void revertState()
+	{
 		block = oldBlock;
 	}
-
 
 	template <class T>
 	void setOffset(sf::Vector2<T>& Offset)
@@ -146,7 +148,8 @@ public:
 		offset.y = (int) Offset.y;
 	}
 
-	void setPosition(const sf::Vector2i& Position) {
+	void setPosition(const sf::Vector2i& Position)
+	{
 		position = Position;
 	}
 
