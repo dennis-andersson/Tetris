@@ -12,8 +12,10 @@ enum SoundEffect
 class Sound
 {
 private:
-	std::unordered_map<SoundEffect, sf::SoundBuffer> effects;
+	static const int numberOfSoundEffects{ 5 };
+	std::array<sf::SoundBuffer, Sound::numberOfSoundEffects> effects;
 	sf::Music backgroundMusic;
+	sf::Sound sound;
 
 public:
 	Sound() {}
@@ -58,18 +60,28 @@ public:
 
 	void playSoundEffect(SoundEffect effect)
 	{
-		if (!backgroundMusic.openFromFile("music.wav"))
-			return;
-		backgroundMusic.play();
+		sound.setBuffer(effects[effect]);
+		sound.play();
 	}
 
 	void loadSoundEffects()
 	{
+		// I changed effects to an array which might be easier to work with.
+		// You can fill out the rest of the method if you like.
 
+		// Pause
+		effects[SoundEffect::Pause].loadFromFile("Sounds/pause.wav");
+
+		// SoftDrop
+		// HardDrop
+		// LinesCleared
+		// Tetris
 	}
 
 	void playBackgroundMusic()
 	{
+		if (!backgroundMusic.openFromFile("music.wav"))
+			return;
 		backgroundMusic.play();
 	}
 
