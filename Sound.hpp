@@ -78,6 +78,16 @@ public:
 		// Tetris
 	}
 
+	void playMenuMusic()
+	{
+
+	}
+
+	void stopMenuMusic()
+	{
+
+	}
+
 	void playBackgroundMusic()
 	{
 		if (!backgroundMusic.openFromFile("music.wav"))

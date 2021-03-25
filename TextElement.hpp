@@ -21,6 +21,7 @@ public:
 	{
 		init(position, size, color, style);
 		text.setString(s);
+
 	}
 
 	void init(sf::Vector2f position, int size, sf::Color color, sf::Uint32 style)
@@ -73,6 +74,18 @@ public:
 	bool isVisible()
 	{
 		return visible;
+	}
+
+	void setColor(sf::Color textColor)
+	{
+		text.setFillColor(textColor);
+	}
+
+	void setOriginToCenter()
+	{
+		sf::FloatRect bounds = text.getLocalBounds();
+
+		text.setOrigin(bounds.width / 2, bounds.height / 2);
 	}
 };
 

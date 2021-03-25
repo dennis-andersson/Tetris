@@ -6,8 +6,5 @@
 
 class CreditsScreen : public Screen
 {
-public:
-	void HandleInput() {}
-	void Render() {}
 };
 
