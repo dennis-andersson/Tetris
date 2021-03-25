@@ -208,7 +208,7 @@ public:
 		}
 
 		// Draw text
-		drawTextElements(window);
+		drawTextElements();
 
 		window.display();
 	}
@@ -230,7 +230,7 @@ public:
 				deltaTime = clock.restart();
 				elapsedTime += deltaTime;
 
-				processEvents(window);
+				processEvents();
 				update(elapsedTime, deltaTime);
 
 				if (elapsedTime > trigger) {
@@ -238,7 +238,7 @@ public:
 					moveShape(Direction::Down);
 				}
 
-				render(window);
+				render();
 			} else {
 				sf::Event event;
 
@@ -250,7 +250,7 @@ public:
 						return;
 				}
 
-				render(window);
+				render();
 			}
 		}
 	}
