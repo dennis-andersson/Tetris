@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include <fstream>
 
-enum SoundEffect
+enum SoundEffect 
 {
 	Pause, SoftDrop, HardDrop, LinesCleared, Tetris
 };
@@ -58,7 +58,9 @@ public:
 
 	void playSoundEffect(SoundEffect effect)
 	{
-
+		if (!backgroundMusic.openFromFile("music.wav"))
+			return;
+		backgroundMusic.play();
 	}
 
 	void loadSoundEffects()
@@ -68,17 +70,19 @@ public:
 
 	void playBackgroundMusic()
 	{
-
+		backgroundMusic.play();
 	}
 
 	void pauseBackgroundMusic()
 	{
 
+		backgroundMusic.pause();
 	}
 
 	void stopBackgroundMusic()
 	{
 
+		backgroundMusic.pause();
 	}
 
 	void nextLevelReached()
