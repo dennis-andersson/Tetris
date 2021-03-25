@@ -63,7 +63,8 @@ public:
 		return state[row][column];
 	}
 
-	void addBlock(int id, std::array<sf::Vector2i, 4> block) {
+	void addBlock(int id, std::array<sf::Vector2i, 4> block)
+	{
 		for (int i = 0; i < 4; ++i) {
 			int row = block[i].y;
 			int col = block[i].x;
@@ -74,7 +75,7 @@ public:
 
 	int markLinesForRemoval()
 	{
-		if (aboutToRemoveBlocks())
+		if (aboutToRemoveLines())
 			return linesToRemove.size();
 
 		for (int row = height - 1; row >= 0; --row) {
@@ -111,14 +112,15 @@ public:
 		linesToRemove.clear();
 	}
 
-	inline bool aboutToRemoveBlocks() const
+	inline bool aboutToRemoveLines() const
 	{
 		return !linesToRemove.empty();
 	}
 
-	void update(const sf::Time& deltaTime) {
+	void update(const sf::Time& deltaTime)
+	{
 		markLinesForRemoval();
-		if (aboutToRemoveBlocks()) {
+		if (aboutToRemoveLines()) {
 			elapsedTime += deltaTime.asSeconds();
 			blink();
 			if (elapsedTime > 0.6f) {
@@ -134,7 +136,7 @@ public:
 		int num = int(elapsedTime * 5.f);
 
 		for (auto i : linesToRemove)
-			visibleLines[i] = (num % 2 != 0);
+			setVisible(i, (num % 2 != 0));
 	}
 
 	bool isVisible(int row)

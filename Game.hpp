@@ -22,6 +22,8 @@
 class Game
 {
 private:
+	sf::RenderWindow window;
+	const std::string windowTitle{ "Tetris" };
 	const int WindowWidth{ 500 };
 	const int WindowHeight{ 580 };
 	HighScoreTable highScores;
@@ -42,9 +44,17 @@ private:
 	sf::Vector2i shapeFirstPosition;
 	sf::Vector2i nextShapePosition;
 
-	int blockColors{ 8 };
+	const int blockColors{ 8 };
+	const int blocksInAShape{ 4 };
 	sf::Texture blockTextures;
 	std::vector<sf::Sprite> blocks;
+
+	Direction direction;
+	bool rotateShape{ false };
+	float dpadX, dpadY;
+	float limit{ 15.f };
+	float delta{ 0.2f };
+	float X, Y;
 
 	int textSize{ 20 };
 	sf::Uint32 textStyle{ sf::Text::Bold };
@@ -66,11 +76,12 @@ private:
 
 	int getRandomShapeId()
 	{
-		int n = getRandomNumber(7) % 7;
+		int n = getRandomNumber(shapes) % shapes;
 		return n;
 	}
 
-	int getRandomNumber(int max) {
+	int getRandomNumber(int max)
+	{
 		std::uniform_int_distribution<int> int_distribution(max);
 		return int_distribution(engine);
 	}
@@ -127,7 +138,8 @@ private:
 		newShape(currentShape, shapeFirstPosition);
 		newShape(nextShape, nextShapePosition);
 
-		// TODO: Load sound effects
+		// Load sound effects
+		sound.loadSoundEffects();
 	}
 
 	void newShapes()
@@ -148,7 +160,7 @@ private:
 		newShape(shape, position, getRandomShapeId());
 	}
 
-	void drawTextElements(sf::RenderWindow& window)
+	void drawTextElements()
 	{
 		for (auto te : fixedTextElements)
 			te.draw(window);
@@ -169,7 +181,7 @@ public:
 		return blocks[blockId];
 	}
 
-	void render(sf::RenderWindow &window)
+	void render()
 	{
 		window.clear();
 
@@ -206,7 +218,7 @@ public:
 		return sf::Vector2f(borderPosition.x + (column * BlockSize), borderPosition.y + (row * BlockSize));
 	}
 
-	void GameLoop(sf::RenderWindow &window)
+	void GameLoop()
 	{
 		sf::Clock clock;
 		sf::Time deltaTime{ sf::Time::Zero };
@@ -243,7 +255,8 @@ public:
 		}
 	}
 
-	void update(const sf::Time& elapsedTime, const sf::Time& deltaTime) {
+	void update(const sf::Time& elapsedTime, const sf::Time& deltaTime)
+	{
 		if (direction != Direction::None)
 			moveShape(direction);
 
@@ -253,13 +266,14 @@ public:
 		grid.update(deltaTime);
 
 		if (!currentShape.isVisible()) {
-			if (grid.aboutToRemoveBlocks())
+			if (grid.aboutToRemoveLines())
 				return;
 			newShapes();
 		}
 	}
 
-	void moveShape(Direction direction) {
+	void moveShape(Direction direction)
+	{
 		if (canMove(currentShape.getFutureBlockPositions(direction))) {
 			currentShape.move(direction);
 		} else {
@@ -284,14 +298,18 @@ public:
 
 	void gameOver()
 	{
+		int startRow{ 10 };
+		int endRow{ 16 };
+
 		GameOver = true;
 		gameOverText.setVisible(true);
-		for (int row = 10; row < 16; ++row)
+		for (int row = startRow; row < endRow; ++row)
 			grid.setVisible(row, false);
 	}
 
-	bool canMove(std::array<sf::Vector2i, 4> block) {
-		for (int i = 0; i < 4; ++i) {
+	bool canMove(std::array<sf::Vector2i, 4> block)
+	{
+		for (int i = 0; i < blocksInAShape; ++i) {
 			if (block[i].x < 0 || block[i].x > (Width - 1) || block[i].y > (Height - 1))
 				return false;
 
@@ -301,14 +319,8 @@ public:
 		return true;
 	}
 
-	Direction direction;
-	bool rotateShape{ false };
-	float dpadX, dpadY;
-	float limit{ 15.f };
-	float delta{ 0.2f };
-	float X, Y;
-
-	void processEvents(sf::RenderWindow &window) {
+	void processEvents()
+	{
 		sf::Event event;
 
 		rotateShape = false;
@@ -363,7 +375,8 @@ public:
 		}
 	}
 
-	void rotate() {
+	void rotate()
+	{
 		currentShape.rotate();
 
 		if (!canMove(currentShape.getBlockPositions()))
@@ -379,9 +392,11 @@ public:
 		return buttonPressed;
 	}
 
-	void newGame()
+	void Run()
 	{
-		sf::RenderWindow window(sf::VideoMode(WindowWidth, WindowHeight), "Tetris");
+		highScores.readHighScores();
+
+		window.create(sf::VideoMode(WindowWidth, WindowHeight), windowTitle);
 
 		sf::SoundBuffer buffer;
 		if (!buffer.loadFromFile("sounds/pause.wav")) {
@@ -402,14 +417,9 @@ public:
 			linesCleared = 0;
 			grid.clear();
 
-			GameLoop(window);
+			GameLoop();
 		}
-	}
 
-	void Run()
-	{
-		highScores.readHighScores();
-		newGame();
 		highScores.saveHighScores();
 	}
 };
