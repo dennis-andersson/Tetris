@@ -43,37 +43,14 @@ public:
 
 		highScores.readHighScores();
 
-		//Menu, LevelSelection, GameScreen, HighScores, Credits, None
-
-//		std::array<Screen, 5> screens{ MenuScreen(window), 
-//										LevelSelectionScreen(window), 
-////										GameScreen(),
-//										CreditsScreen(window),
-//										HighScoreTableScreen(window), 
-//										CreditsScreen(window) };
-//
-
-		//std::array<Screen, 5> screens;
-		//screens[0] = MenuScreen();
-		//auto foo = screens[0];
-//		screens[1] = LevelSelectionScreen();
-//		//	screens[1] = GameScreen();
-//		screens[2] = CreditsScreen();
-//		screens[3] = HighScoreTableScreen();
-//		screens[4] = CreditsScreen();
-
-		//std::vector<Screen> screens2{ MenuScreen(),
-		//											LevelSelectionScreen(), 
-		//	//										GameScreen(),
-		//											CreditsScreen(),
-		//											HighScoreTableScreen(), 
-		//											CreditsScreen() };
 		MenuScreen menu;
 		GameScreen game;
 		LevelSelectionScreen levelSelection;
 		CreditsScreen credits;
-		HighScoreTableScreen hs;
-	
+		HighScoreTableScreen highScoreTable;
+
+		highScoreTable.setHighScores(highScores);
+
 		ScreensEnum currentScreen = ScreensEnum::Menu;
 
 		while (currentScreen != ScreensEnum::None) {
@@ -88,14 +65,12 @@ public:
 				currentScreen = levelSelection.run(window);
 				break;
 			case ScreensEnum::HighScores:
-				currentScreen = hs.run(window);
+				currentScreen = highScoreTable.run(window);
 				break;
 			case ScreensEnum::Credits:
 				currentScreen = credits.run(window);
 				break;
 			}
-			//currentScreen = screens[currentScreen].run(window);
-			//currentScreen = screen.run(window);
 		}
 
 		highScores.saveHighScores();
