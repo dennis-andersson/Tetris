@@ -7,7 +7,6 @@
 #include <stack>
 #include <random>
 #include <chrono>
-#include "Screen.hpp"
 #include "MenuScreen.hpp"
 #include "Tetromino.hpp"
 #include "HighScoreTable.hpp"
@@ -17,7 +16,15 @@
 #include "Score.hpp"
 #include "Border.hpp"
 #include "Direction.hpp"
-#include "Sound.hpp"
+
+
+
+#include "Screen.hpp"
+#include "ScreensEnum.hpp"
+#include "LevelSelectionScreen.hpp"
+#include "GameScreen.hpp"
+#include "HighScoreTableScreen.hpp"
+#include "CreditsScreen.hpp"
 
 class Game
 {
@@ -28,396 +35,67 @@ private:
 	const int WindowHeight{ 580 };
 	HighScoreTable highScores;
 
-	// Stack area
-	// 15 x 30 blocks
-	const int Width { 15 };
-	const int Height { 30 };
-	const int BlockSize{ 18 };
-	sf::Vector2f borderSize;
-	sf::Vector2f borderPosition;
-	Border border;
-	Grid grid;
-
-	int shapes{ 7 };
-	Tetromino currentShape;
-	Tetromino nextShape;
-	sf::Vector2i shapeFirstPosition;
-	sf::Vector2i nextShapePosition;
-
-	const int blockColors{ 8 };
-	const int blocksInAShape{ 4 };
-	sf::Texture blockTextures;
-	std::vector<sf::Sprite> blocks;
-
-	Direction direction;
-	bool rotateShape{ false };
-	float dpadX, dpadY;
-	float limit{ 15.f };
-	float delta{ 0.2f };
-	float X, Y;
-
-	int textSize{ 20 };
-	sf::Uint32 textStyle{ sf::Text::Bold };
-
-	std::vector<TextElement> fixedTextElements;
-	TextElement scoreText;
-	TextElement levelText;
-	TextElement linesText;
-	TextElement gameOverText;
-
-	Score currentScore;
-	int linesCleared{ 0 };
-	Level currentLevel;
-	bool GameOver;
-
-	Sound sound;
-
-	std::default_random_engine engine{ static_cast<unsigned int>(std::chrono::system_clock::now().time_since_epoch().count()) };
-
-	int getRandomShapeId()
-	{
-		int n = getRandomNumber(shapes) % shapes;
-		return n;
-	}
-
-	int getRandomNumber(int max)
-	{
-		std::uniform_int_distribution<int> int_distribution(max);
-		return int_distribution(engine);
-	}
-
-	void generateBlocks()
-	{
-		blockTextures.loadFromFile("Images/blocks.png");
-
-		for (int i = 0; i < blockColors; ++i)
-			blocks.push_back(sf::Sprite(blockTextures, sf::IntRect(i * BlockSize, 0, BlockSize, BlockSize)));
-	}
-
-	void setup()
-	{
-		generateBlocks();
-
-		// Setup grid
-		grid.setDimensions(Width, Height);
-
-		// Setup game border
-		borderPosition.x = 40.f;
-		borderPosition.y = 20.f;
-		borderSize.x = Width * BlockSize;
-		borderSize.y = Height * BlockSize;
-		border.setSize(borderSize);
-		border.setPosition(borderPosition);
-
-		// Setup text elements
-		std::vector<std::string> fixedStrings{ "Score", "Level", "Lines" };
-		sf::Color textColor(193, 193, 193, 255);
-		float inity{ 25.f };
-		float x{ WindowWidth - 140.f };
-		float y{ inity };
-		float step = 90.f;
-
-		for (int i = 0; i < fixedStrings.size(); ++i, y += step)
-			fixedTextElements.push_back(TextElement(fixedStrings[i], sf::Vector2f(x, y), textSize, textColor, sf::Text::Bold));
-
-		fixedTextElements.push_back(TextElement("Next", sf::Vector2f(x, y + 40), textSize, textColor, sf::Text::Bold));
-
-		y = inity + 35;
-		scoreText.init(sf::Vector2f(x, y), textSize, sf::Color::White, sf::Text::Bold);
-		levelText.init(sf::Vector2f(x, y += step), textSize, sf::Color::White, sf::Text::Bold);
-		linesText.init(sf::Vector2f(x, y += step), textSize, sf::Color::White, sf::Text::Bold);
-		gameOverText.init("GAME OVER", sf::Vector2f(borderPosition.x + 0.5f * Width, WindowHeight * 0.4f), textSize * 2, sf::Color::White, sf::Text::Bold);
-		gameOverText.toggleVisible();
-
-		// Shape setup
-		shapeFirstPosition.x = 6;
-		shapeFirstPosition.y = 0;
-		nextShapePosition.x = 20;
-		nextShapePosition.y = 20;
-		currentShape.setOffset(borderPosition);
-		newShape(currentShape, shapeFirstPosition);
-		newShape(nextShape, nextShapePosition);
-
-		// Load sound effects
-		sound.loadSoundEffects();
-	}
-
-	void newShapes()
-	{
-		newShape(currentShape, shapeFirstPosition, nextShape.getId());
-		newShape(nextShape, nextShapePosition);
-	}
-
-	void newShape(Tetromino& shape, sf::Vector2i position, int newId)
-	{
-		shape.newShape(newId);
-		shape.setBlocksSprite(blocks[newId]);
-		shape.setPosition(position);
-	}
-
-	void newShape(Tetromino& shape, sf::Vector2i position)
-	{
-		newShape(shape, position, getRandomShapeId());
-	}
-
-	void drawTextElements()
-	{
-		for (auto te : fixedTextElements)
-			te.draw(window);
-
-		scoreText.draw(window, currentScore.score);
-		levelText.draw(window, currentLevel.getLevel());
-		linesText.draw(window, linesCleared);
-		gameOverText.draw(window);
-	}
 public:
-	Game()
-	{
-		setup();
-	}
-
-	sf::Sprite& getBlock(int blockId)
-	{
-		return blocks[blockId];
-	}
-
-	void render()
-	{
-		window.clear();
-
-		// Draw border
-		border.draw(window);
-
-		// Draw blocks
-		for (int row = 0; row < Height; row++) {
-			if (grid.isVisible(row)) {
-				for (int column = 0; column < Width; ++column) {
-					Cell cell = grid.getCell(row, column);
-					int blockId = cell.id;
-					if (cell.empty) continue;
-					blocks[blockId].setPosition(getCellPosition(row, column));
-					window.draw(blocks[blockId]);
-				}
-			}
-		}
-
-		// Draw shape
-		if (!GameOver) {
-			currentShape.draw(window);
-			nextShape.draw(window);
-		}
-
-		// Draw text
-		drawTextElements();
-
-		window.display();
-	}
-
-	sf::Vector2f getCellPosition(int row, int column)
-	{
-		return sf::Vector2f(borderPosition.x + (column * BlockSize), borderPosition.y + (row * BlockSize));
-	}
-
-	void GameLoop()
-	{
-		sf::Clock clock;
-		sf::Time deltaTime{ sf::Time::Zero };
-		sf::Time elapsedTime{ sf::Time::Zero };
-
-		while (window.isOpen()) {
-			if (!GameOver) {
-				sf::Time trigger{ currentLevel.getLevelSpeed() };
-				deltaTime = clock.restart();
-				elapsedTime += deltaTime;
-
-				processEvents();
-				update(elapsedTime, deltaTime);
-
-				if (elapsedTime > trigger) {
-					elapsedTime = sf::Time::Zero;
-					moveShape(Direction::Down);
-				}
-
-				render();
-			} else {
-				sf::Event event;
-
-				while (window.pollEvent(event)) {
-					if (event.type == sf::Event::Closed)
-						window.close();
-					
-					if (event.type == sf::Event::KeyPressed)
-						return;
-				}
-
-				render();
-			}
-		}
-	}
-
-	void update(const sf::Time& elapsedTime, const sf::Time& deltaTime)
-	{
-		if (direction != Direction::None)
-			moveShape(direction);
-
-		if (rotateShape)
-			rotate();
-
-		grid.update(deltaTime);
-
-		if (!currentShape.isVisible()) {
-			if (grid.aboutToRemoveLines())
-				return;
-			newShapes();
-		}
-	}
-
-	void moveShape(Direction direction)
-	{
-		if (canMove(currentShape.getFutureBlockPositions(direction))) {
-			currentShape.move(direction);
-		} else {
-			if (direction == Direction::Down || direction == Direction::SoftDown) {
-				int id = currentShape.getId();
-				grid.addBlock(id, currentShape.getBlockPositions());
-				newShape(currentShape, shapeFirstPosition, nextShape.getId());
-				newShape(nextShape, nextShapePosition);
-				currentScore.addSoftScore(10);
-				int rowsCleared = grid.markLinesForRemoval();
-				if (rowsCleared) {
-					currentScore.addPoints(rowsCleared, currentLevel.getLevel());
-					linesCleared += rowsCleared;
-				}
-				currentLevel.nextLevel(currentScore.score);
-
-				if (!canMove(currentShape.getBlockPositions()))
-					gameOver();
-			}
-		}
-	}
-
-	void gameOver()
-	{
-		int startRow{ 10 };
-		int endRow{ 16 };
-
-		GameOver = true;
-		gameOverText.setVisible(true);
-		for (int row = startRow; row < endRow; ++row)
-			grid.setVisible(row, false);
-	}
-
-	bool canMove(std::array<sf::Vector2i, 4> block)
-	{
-		for (int i = 0; i < blocksInAShape; ++i) {
-			if (block[i].x < 0 || block[i].x > (Width - 1) || block[i].y > (Height - 1))
-				return false;
-
-			if (!grid.getCell(block[i].y, block[i].x).empty)
-				return false;
-		}
-		return true;
-	}
-
-	void processEvents()
-	{
-		sf::Event event;
-
-		rotateShape = false;
-		direction = Direction::None;
-		while (window.pollEvent(event)) {
-			if (event.type == sf::Event::Closed) {
-				window.close();
-			} else if (event.type == sf::Event::KeyPressed) {
-				switch (event.key.code) {
-				case sf::Keyboard::Left:
-					direction = Direction::Left;
-					break;
-				case sf::Keyboard::Right:
-					direction = Direction::Right;
-					break;
-				case sf::Keyboard::Down:
-					direction = Direction::SoftDown;
-					break;
-				case sf::Keyboard::Up:
-					rotateShape = true;
-					break;
-				case sf::Keyboard::A:
-					// DEBUG
-					currentScore.addSoftScore(1200);
-					currentLevel.nextLevel(currentScore.score);
-					break;
-				}
-			}
-
-			if (sf::Joystick::isConnected(0)) {
-				bool buttonPressed = gamepadButtonPressed();
-
-				if (buttonPressed)
-					rotateShape = true;
-
-				X = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::X);
-				Y = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Y);
-
-				dpadX = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::PovX);
-				dpadY = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::PovY);
-
-				if (dpadX > 0.5f)	direction = Direction::Right;
-				if (dpadX < -0.5f)	direction = Direction::Left;
-				if (dpadY < -0.5f)	direction = Direction::SoftDown;
-				if (dpadY > 0.5f)	rotateShape = true;
-
-				if (X > limit)	direction = Direction::Right;
-				if (X < -limit)	direction = Direction::Left;
-				if (Y > limit)	direction = Direction::SoftDown;
-				if (Y < -limit)	rotateShape = true;
-			}
-		}
-	}
-
-	void rotate()
-	{
-		currentShape.rotate();
-
-		if (!canMove(currentShape.getBlockPositions()))
-			currentShape.revertState();
-	}
-
-	bool gamepadButtonPressed()
-	{
-		unsigned int buttonCount = sf::Joystick::getButtonCount(0);
-		bool buttonPressed{ false };
-		for (int i = 0; i < sf::Joystick::getButtonCount(0); ++i)
-			buttonPressed |= sf::Joystick::isButtonPressed(0, i);
-		return buttonPressed;
-	}
-
 	void Run()
 	{
+		window.create(sf::VideoMode(WindowWidth, WindowHeight), windowTitle);
+		window.setFramerateLimit(60);
+
 		highScores.readHighScores();
 
-		window.create(sf::VideoMode(WindowWidth, WindowHeight), windowTitle);
+		//Menu, LevelSelection, GameScreen, HighScores, Credits, None
 
-		sf::SoundBuffer buffer;
-		if (!buffer.loadFromFile("sounds/pause.wav")) {
-			return;
-		}
+//		std::array<Screen, 5> screens{ MenuScreen(window), 
+//										LevelSelectionScreen(window), 
+////										GameScreen(),
+//										CreditsScreen(window),
+//										HighScoreTableScreen(window), 
+//										CreditsScreen(window) };
+//
 
-		sf::Sound sound;
-		sound.setBuffer(buffer);
-		//sound.play();
+		//std::array<Screen, 5> screens;
+		//screens[0] = MenuScreen();
+		//auto foo = screens[0];
+//		screens[1] = LevelSelectionScreen();
+//		//	screens[1] = GameScreen();
+//		screens[2] = CreditsScreen();
+//		screens[3] = HighScoreTableScreen();
+//		screens[4] = CreditsScreen();
 
-		while (true) {
-			// TODO: Play some music to entertain the player.
+		//std::vector<Screen> screens2{ MenuScreen(),
+		//											LevelSelectionScreen(), 
+		//	//										GameScreen(),
+		//											CreditsScreen(),
+		//											HighScoreTableScreen(), 
+		//											CreditsScreen() };
+		MenuScreen menu;
+		GameScreen game;
+		LevelSelectionScreen levelSelection;
+		CreditsScreen credits;
+		HighScoreTableScreen hs;
+	
+		ScreensEnum currentScreen = ScreensEnum::Menu;
 
-			GameOver = false;
-			gameOverText.setVisible(false);
-			currentScore.score = 0;
-			currentLevel.setLevel(1);
-			linesCleared = 0;
-			grid.clear();
-
-			GameLoop();
+		while (currentScreen != ScreensEnum::None) {
+			switch (currentScreen) {
+			case ScreensEnum::Menu:
+				currentScreen = menu.run(window);
+				break;
+			case ScreensEnum::Play:
+				currentScreen = game.run(window);
+				break;
+			case ScreensEnum::LevelSelection:
+				currentScreen = levelSelection.run(window);
+				break;
+			case ScreensEnum::HighScores:
+				currentScreen = hs.run(window);
+				break;
+			case ScreensEnum::Credits:
+				currentScreen = credits.run(window);
+				break;
+			}
+			//currentScreen = screens[currentScreen].run(window);
+			//currentScreen = screen.run(window);
 		}
 
 		highScores.saveHighScores();

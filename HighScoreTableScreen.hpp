@@ -6,8 +6,5 @@
 
 class HighScoreTableScreen : public Screen
 {
-public:
-	void HandleInput() {}
-	void Render() {}
 };
 

@@ -68,5 +68,11 @@
     <ClInclude Include="Sound.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ScreensEnum.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Input.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
