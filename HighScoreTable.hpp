@@ -8,6 +8,8 @@ struct HighScore
 {
 	std::string Name;
 	int Score;
+
+	HighScore(std::string name, int score) : Name(name), Score(score) {}
 };
 
 // We can use a simple text format to begin with.
@@ -35,6 +37,7 @@ public:
 	void readHighScores()
 	{
 		// Read lines from a file and add the high score to HighScores.
+		HighScores.push_back(HighScore(std::string("Ali"), 1000000));
 	}
 
 	void saveHighScores()
