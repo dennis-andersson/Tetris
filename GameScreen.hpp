@@ -74,6 +74,7 @@ private:
 	Sound sound;
 
 	bool initialized{ false };
+	bool endGame{ false };
 
 	std::default_random_engine engine{ static_cast<unsigned int>(std::chrono::system_clock::now().time_since_epoch().count()) };
 
@@ -233,6 +234,9 @@ public:
 				elapsedTime += deltaTime;
 
 				processEvents(window);
+
+				if (endGame) return;
+
 				update(deltaTime);
 
 				if (elapsedTime > trigger) {
@@ -346,6 +350,9 @@ public:
 				case sf::Keyboard::Up:
 					rotateShape = true;
 					break;
+				case sf::Keyboard::Escape:
+					endGame = true;
+					break;
 				case sf::Keyboard::A:
 					// DEBUG
 					currentScore.addSoftScore(1200);
@@ -392,12 +399,13 @@ public:
 		if (!initialized)
 			setup();
 
-		while (true) {
+		while (!endGame) {
 			// TODO: Play some music to entertain the player.
 
 			resetGame();
 			GameLoop(window);
 		}
+		endGame = false;
 
 		return ScreensEnum::Menu;
 	}
@@ -409,6 +417,7 @@ public:
 		currentScore.score = 0;
 		currentLevel.reset();
 		linesCleared = 0;
+		newShapes();
 		grid.makeAllRowsVisible();
 		grid.clear();
 	}
