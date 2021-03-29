@@ -166,6 +166,8 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AddHighScoreScreen.hpp" />
+    <ClInclude Include="Background.hpp" />
     <ClInclude Include="Border.hpp" />
     <ClInclude Include="CreditsScreen.hpp" />
     <ClInclude Include="Direction.hpp" />
@@ -178,12 +180,19 @@
     <ClInclude Include="LevelSelectionScreen.hpp" />
     <ClInclude Include="MenuScreen.hpp" />
     <ClInclude Include="GameScreen.hpp" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="Score.hpp" />
     <ClInclude Include="Screen.hpp" />
     <ClInclude Include="ScreensEnum.hpp" />
     <ClInclude Include="Sound.hpp" />
     <ClInclude Include="Tetromino.hpp" />
     <ClInclude Include="TextElement.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Tetris.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Icons\tetris.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

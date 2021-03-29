@@ -6,6 +6,7 @@
 #include "TextElement.hpp"
 #include <array>
 #include "Input.hpp"
+#include "Background.hpp"
 
 class MenuScreen : public Screen
 {
@@ -21,15 +22,19 @@ private:
 	int option{ 0 };
 	std::array<TextElement, MenuScreen::numberOfOptions> options;
 	TextElement title;
+	Background background;
+	int Width, Height;
 
 	void init(sf::RenderWindow& window)
 	{
 		sf::Vector2u windowSize = window.getSize();
 		std::array<sf::Vector2f, numberOfOptions> positions;
+		Width = windowSize.x;
+		Height = windowSize.y;
 
 		for (int i = 0; i < numberOfOptions; ++i) {
-			positions[i].x = windowSize.x / 2;
-			positions[i].y = (windowSize.y / 2) + (i * (textSize + 9));
+			positions[i].x = Width / 2;
+			positions[i].y = (Height / 2) + (i * (textSize + 9));
 		}
 
 		options[0].init(std::string("Play"), positions[0], textSize, selectedOptionColor, sf::Text::Regular);
@@ -37,12 +42,19 @@ private:
 		options[2].init(std::string("Credits"), positions[2], textSize, nonSelectedOptionColor, sf::Text::Regular);
 		options[3].init(std::string("Quit"), positions[3], textSize, nonSelectedOptionColor, sf::Text::Regular);
 
-		title.init(std::string("TETRIS"), sf::Vector2f(windowSize.x / 2, windowSize.y * 0.1f), textSize * 3, nonSelectedOptionColor, sf::Text::Bold);
+		title.init(std::string("TETRIS"), sf::Vector2f(Width / 2, Height * 0.1f), textSize * 3, nonSelectedOptionColor, sf::Text::Bold);
 		title.setOriginToCenter();
 
 		for (int i = 0; i < numberOfOptions; ++i) {
 			options[i].setOriginToCenter();
 		}
+
+		//background.setBackground("Images/background.jpg");
+		//background.setBackground("Images/background2.jpg");
+		//background.setBackground("Images/background3.jpg");
+		//background.setBackground("Images/background4.jpg");
+		background.setBackground("Images/background5.jpg");
+		background.setSize(Width, Height);
 
 		initialized = true;
 	}
@@ -115,6 +127,7 @@ public:
 	{
 		window.clear();
 
+		background.draw(window);
 		title.draw(window);
 
 		for (int i = 0; i < numberOfOptions; ++i)
