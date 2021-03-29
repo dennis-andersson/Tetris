@@ -148,4 +148,10 @@ public:
 	{
 		visibleLines[row] = visible;
 	}
+
+	void makeAllRowsVisible()
+	{
+		for (int i = 0; i < visibleLines.size(); ++i)
+			setVisible(i, true);
+	}
 };

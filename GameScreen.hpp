@@ -241,8 +241,7 @@ public:
 				}
 
 				render(window);
-			}
-			else {
+			} else {
 				sf::Event event;
 
 				while (window.pollEvent(event)) {
@@ -396,17 +395,22 @@ public:
 		while (true) {
 			// TODO: Play some music to entertain the player.
 
-			GameOver = false;
-			gameOverText.setVisible(false);
-			currentScore.score = 0;
-			currentLevel.setLevel(1);
-			linesCleared = 0;
-			grid.clear();
-
+			resetGame();
 			GameLoop(window);
 		}
 
 		return ScreensEnum::Menu;
+	}
+
+	void resetGame()
+	{
+		GameOver = false;
+		gameOverText.setVisible(false);
+		currentScore.score = 0;
+		currentLevel.reset();
+		linesCleared = 0;
+		grid.makeAllRowsVisible();
+		grid.clear();
 	}
 };
 
