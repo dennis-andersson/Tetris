@@ -50,10 +50,10 @@ private:
 		}
 
 		//background.setBackground("Images/background.jpg");
-		//background.setBackground("Images/background2.jpg");
+		background.setBackground("Images/background2.jpg");
 		//background.setBackground("Images/background3.jpg");
 		//background.setBackground("Images/background4.jpg");
-		background.setBackground("Images/background5.jpg");
+		//background.setBackground("Images/background5.jpg");
 		background.setSize(Width, Height);
 
 		initialized = true;
