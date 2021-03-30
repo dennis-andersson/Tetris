@@ -344,10 +344,10 @@ public:
 	{
 		mode = GameMode::GameOver;
 		gameOverText.setVisible(true);
-		foo();
+		makeRoomForText();
 	}
 
-	void foo()
+	void makeRoomForText()
 	{
 		int startRow{ 10 };
 		int endRow{ 16 };
@@ -476,7 +476,7 @@ public:
 	{
 		mode = (mode == GameMode::Running) ? GameMode::Paused : GameMode::Running;
 		pausedText.toggleVisible();
-		foo();
+		makeRoomForText();
 	}
 };
 
