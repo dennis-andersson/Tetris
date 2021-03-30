@@ -37,12 +37,29 @@ public:
 	void readHighScores()
 	{
 		// Read lines from a file and add the high score to HighScores.
-		HighScores.push_back(HighScore(std::string("Ali"), 1000000));
+		std::ifstream file;
+		file.open(filename);
+		std::string line;
+		int Score;
+		int counter = 10;
+		while (!file.eof() && counter--) {
+			getline(file, line);
+			file >> Score;
+			HighScores.push_back(HighScore(line, Score));
+		}
+		file.close();
 	}
 
 	void saveHighScores()
 	{
 		// Save the high scores to the high score table file.
+		std::ofstream file;
+		file.open(filename);
+		for (int i = 0; i < HighScores.size(); ++i) {
+			file << HighScores[i].Name << "\n" << HighScores[i].Score << "\n";
+			/*file << v[i] << endl;*/
+		}
+		file.close();
 	}
 
 	void addHighScore(std::string name, int score)
