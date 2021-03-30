@@ -6,7 +6,8 @@
 class TextElement
 {
 private:
-	sf::Font font;
+	static bool fontLoaded;
+	static sf::Font font;
 	sf::Text text;
 	bool visible{ true };
 public:
@@ -26,12 +27,16 @@ public:
 
 	void init(sf::Vector2f position, int size, sf::Color color, sf::Uint32 style)
 	{
-		font.loadFromFile("Fonts/arial.ttf");
+		if (!fontLoaded) {
+			TextElement::font.loadFromFile("Fonts/arial.ttf");
+			TextElement::fontLoaded = true;
+		}
+
 		text.setCharacterSize(size);
 		text.setPosition(position);
 		text.setFillColor(color);
 		text.setStyle(style);
-		text.setFont(font);
+		text.setFont(TextElement::font);
 		visible = true;
 	}
 
@@ -43,7 +48,7 @@ public:
 
 	void draw(sf::RenderWindow &window)
 	{
-		text.setFont(font);
+		text.setFont(TextElement::font);
 		if (visible)
 			window.draw(text);
 	}
@@ -94,3 +99,5 @@ public:
 	}
 };
 
+sf::Font TextElement::font;
+bool TextElement::fontLoaded = false;
