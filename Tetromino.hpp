@@ -174,6 +174,11 @@ public:
 		}
 	}
 
+	void setVisible(bool flag)
+	{
+		visible = flag;
+	}
+
 	void toggleVisible()
 	{
 		visible = !visible;

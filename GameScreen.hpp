@@ -20,13 +20,16 @@
 #include "Screen.hpp"
 #include "Input.hpp"
 
+enum GameMode
+{
+	Running, RemovingLines, Paused, GameOver
+};
+
 class GameScreen : public Screen
 {
 private:
-	//sf::RenderWindow window;
-	//const std::string windowTitle{ "Tetris" };
-	const int WindowWidth{ 500 };
-	const int WindowHeight{ 580 };
+	int WindowWidth;
+	int WindowHeight;
 	HighScoreTable highScores;
 
 	// Stack area
@@ -65,11 +68,11 @@ private:
 	TextElement levelText;
 	TextElement linesText;
 	TextElement gameOverText;
+	TextElement pausedText;
 
 	Score currentScore;
 	int linesCleared{ 0 };
 	Level currentLevel;
-	bool GameOver;
 
 	Sound sound;
 
@@ -134,6 +137,8 @@ private:
 		linesText.init(sf::Vector2f(x, y += step), textSize, textColor2, textStyle);
 		gameOverText.init("GAME OVER", sf::Vector2f(borderPosition.x + 0.5f * Width, WindowHeight * 0.4f), textSize * 2, textColor2, textStyle);
 		gameOverText.toggleVisible();
+		pausedText.init("PAUSED", sf::Vector2f(borderPosition.x + 3.5f * Width, WindowHeight * 0.4f), textSize * 2, textColor2, textStyle);
+		pausedText.toggleVisible();
 
 		// Shape setup
 		shapeFirstPosition.x = 6;
@@ -161,6 +166,7 @@ private:
 		shape.newShape(newId);
 		shape.setBlocksSprite(blocks[newId]);
 		shape.setPosition(position);
+		shape.setVisible(true);
 	}
 
 	void newShape(Tetromino& shape, sf::Vector2i position)
@@ -177,6 +183,7 @@ private:
 		levelText.draw(window, currentLevel.getLevel());
 		linesText.draw(window, linesCleared);
 		gameOverText.draw(window);
+		pausedText.draw(window);
 	}
 public:
 	sf::Sprite& getBlock(int blockId)
@@ -205,7 +212,7 @@ public:
 		}
 
 		// Draw shape
-		if (!GameOver) {
+		if (mode == GameMode::Running) {
 			currentShape.draw(window);
 			nextShape.draw(window);
 		}
@@ -228,11 +235,12 @@ public:
 		sf::Time elapsedTime{ sf::Time::Zero };
 
 		while (window.isOpen()) {
-			if (!GameOver) {
-				sf::Time trigger{ currentLevel.getLevelSpeed() };
-				deltaTime = clock.restart();
-				elapsedTime += deltaTime;
+			sf::Time trigger{ currentLevel.getLevelSpeed() };
+			deltaTime = clock.restart();
+			elapsedTime += deltaTime;
 
+			switch (mode) {
+			case GameMode::Running:
 				processEvents(window);
 
 				if (endGame) return;
@@ -245,18 +253,44 @@ public:
 				}
 
 				render(window);
-			} else {
+				break;
+			case GameMode::RemovingLines:
+				processEvents(window);
+				if (endGame) return;
+				update(deltaTime);
+				render(window);
+				if (!grid.aboutToRemoveLines())
+					mode = GameMode::Running;
+				break;
+			case GameMode::Paused:
+				processEvents(window);
+				if (endGame) return;
+				update(deltaTime);
+				render(window);
+				break;
+			case GameMode::GameOver:
 				sf::Event event;
 
 				while (window.pollEvent(event)) {
 					if (event.type == sf::Event::Closed)
 						window.close();
 
-					if (event.type == sf::Event::KeyPressed)
+					if (event.type == sf::Event::JoystickButtonPressed) {
+						mode = Running;
 						return;
+					}
+
+					if (event.type == sf::Event::KeyPressed) {
+						if (event.key.code == sf::Keyboard::Escape)
+							endGame = true;
+						else
+							mode = Running;
+						return;
+					}
 				}
 
 				render(window);
+				break;
 			}
 		}
 	}
@@ -282,36 +316,44 @@ public:
 	{
 		if (canMove(currentShape.getFutureBlockPositions(direction))) {
 			currentShape.move(direction);
-		}
-		else {
+		} else {
 			if (direction == Direction::Down || direction == Direction::SoftDown) {
 				int id = currentShape.getId();
 				grid.addBlock(id, currentShape.getBlockPositions());
-				newShape(currentShape, shapeFirstPosition, nextShape.getId());
-				newShape(nextShape, nextShapePosition);
-				currentScore.addSoftScore(10);
-				int rowsCleared = grid.markLinesForRemoval();
-				if (rowsCleared) {
-					currentScore.addPoints(rowsCleared, currentLevel.getLevel());
-					linesCleared += rowsCleared;
-				}
-				currentLevel.nextLevel(currentScore.score);
+				currentShape.toggleVisible();
 
-				if (!canMove(currentShape.getBlockPositions()))
-					gameOver();
+				currentScore.addSoftScore(10);
+				int rowsToRemove = grid.markLinesForRemoval();
+
+				if (rowsToRemove) {
+					currentScore.addPoints(rowsToRemove, currentLevel.getLevel());
+					linesCleared += rowsToRemove;
+					mode = GameMode::RemovingLines;
+				} else {
+					newShapes();
+					if (!canMove(currentShape.getBlockPositions()))
+						gameOver();
+				}
+
+				currentLevel.nextLevel(currentScore.score);
 			}
 		}
 	}
 
 	void gameOver()
 	{
+		mode = GameMode::GameOver;
+		gameOverText.setVisible(true);
+		foo();
+	}
+
+	void foo()
+	{
 		int startRow{ 10 };
 		int endRow{ 16 };
 
-		GameOver = true;
-		gameOverText.setVisible(true);
 		for (int row = startRow; row < endRow; ++row)
-			grid.setVisible(row, false);
+			grid.setVisible(row, !grid.isVisible(row));
 	}
 
 	bool canMove(std::array<sf::Vector2i, 4> block)
@@ -352,6 +394,9 @@ public:
 					break;
 				case sf::Keyboard::Escape:
 					endGame = true;
+					break;
+				case sf::Keyboard::P:
+					pauseGame();
 					break;
 				case sf::Keyboard::A:
 					// DEBUG
@@ -394,8 +439,13 @@ public:
 			currentShape.revertState();
 	}
 
+	GameMode mode;
+
 	ScreensEnum run(sf::RenderWindow& window)
 	{
+		WindowWidth = window.getSize().x;
+		WindowHeight = window.getSize().y;
+
 		if (!initialized)
 			setup();
 
@@ -412,7 +462,7 @@ public:
 
 	void resetGame()
 	{
-		GameOver = false;
+		mode = GameMode::Running;
 		gameOverText.setVisible(false);
 		currentScore.score = 0;
 		currentLevel.reset();
@@ -420,6 +470,13 @@ public:
 		newShapes();
 		grid.makeAllRowsVisible();
 		grid.clear();
+	}
+
+	void pauseGame()
+	{
+		mode = (mode == GameMode::Running) ? GameMode::Paused : GameMode::Running;
+		pausedText.toggleVisible();
+		foo();
 	}
 };
 
