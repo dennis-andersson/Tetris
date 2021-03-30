@@ -51,9 +51,7 @@ public:
 		GameScreen game;
 		LevelSelectionScreen levelSelection;
 		CreditsScreen credits;
-		HighScoreTableScreen highScoreTable;
-
-		highScoreTable.setHighScores(highScores);
+		HighScoreTableScreen highScoreTable(highScores);
 
 		ScreensEnum currentScreen = ScreensEnum::Menu;
 

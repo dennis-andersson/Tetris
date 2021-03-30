@@ -11,7 +11,7 @@ class HighScoreTableScreen : public Screen
 private:
 	HighScoreTable highScores;
 public:
-	HighScoreTableScreen()
+	HighScoreTableScreen(HighScoreTable& HighScores) : highScores(HighScores)
 	{
 		// Add whatever needs to be setup here.
 	}
@@ -30,11 +30,6 @@ public:
 		// Draw stuff here.
 
 		window.display();
-	}
-
-	void setHighScores(HighScoreTable& HighScores)
-	{
-		highScores = HighScores;
 	}
 };
 
