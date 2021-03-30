@@ -34,12 +34,16 @@ private:
 	const int WindowWidth{ 500 };
 	const int WindowHeight{ 580 };
 	HighScoreTable highScores;
+	sf::Image titleBarIcon;
 
 public:
 	void Run()
 	{
 		window.create(sf::VideoMode(WindowWidth, WindowHeight), windowTitle);
 		window.setFramerateLimit(60);
+
+		titleBarIcon.loadFromFile("Icons/tetris.png");
+		window.setIcon(titleBarIcon.getSize().x, titleBarIcon.getSize().y, titleBarIcon.getPixelsPtr());
 
 		highScores.readHighScores();
 
