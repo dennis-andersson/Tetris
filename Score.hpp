@@ -22,8 +22,6 @@ public:
 			score += (3 * points[rowsCleared - 1]) * level;
 		else
 			score += points[rowsCleared - 1] * level;
-
-		// TODO: Play a sound effect based on the number of rows cleared.
 	}
 };
 
