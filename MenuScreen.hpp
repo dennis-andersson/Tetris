@@ -17,15 +17,14 @@ private:
 	std::array<ScreensEnum, 4> choices{ ScreensEnum::LevelSelection, ScreensEnum::HighScores, ScreensEnum::Credits, ScreensEnum::None };
 	ScreensEnum chosenScreen;
 	bool selectedOption{ false };
-	bool initialized{ false };
 	int textSize{ 26 };
 	int option{ 0 };
 	std::array<TextElement, MenuScreen::numberOfOptions> options;
 	TextElement title;
 	Background background;
 	int Width, Height;
-
-	void init(sf::RenderWindow& window)
+public:
+	MenuScreen(sf::RenderWindow& window, Background& Background) : background(Background)
 	{
 		sf::Vector2u windowSize = window.getSize();
 		std::array<sf::Vector2f, numberOfOptions> positions;
@@ -45,21 +44,10 @@ private:
 		title.init(std::string("TETRIS"), sf::Vector2f(Width / 2, Height * 0.1f), textSize * 3, nonSelectedOptionColor, sf::Text::Bold);
 		title.setOriginToCenter();
 
-		for (int i = 0; i < numberOfOptions; ++i) {
+		for (int i = 0; i < numberOfOptions; ++i)
 			options[i].setOriginToCenter();
-		}
-
-		//background.setBackground("Images/background.jpg");
-		//background.setBackground("Images/background2.jpg");
-		background.setBackground("Images/background3.jpg");
-		//background.setBackground("Images/background4.jpg");
-		//background.setBackground("Images/background5.jpg");
-		//background.setBackground("Images/background6.png");
-		background.setSize(Width, Height);
-
-		initialized = true;
 	}
-public:
+
 	void newOption(int n)
 	{
 		options[option].setColor(nonSelectedOptionColor);
@@ -139,9 +127,6 @@ public:
 
 	ScreensEnum run(sf::RenderWindow& window)
 	{
-		if (!initialized)
-			init(window);
-
 		while (window.isOpen()) {
 			processInput(window);
 

@@ -3,12 +3,18 @@
 #include <SFML/Graphics.hpp>
 #include "Screen.hpp"
 #include "Game.hpp"
+#include "Background.hpp"
 
 class LevelSelectionScreen : public Screen
 {
 private:
 	bool goBack{ false };
+	Background background;
 public:
+	LevelSelectionScreen(sf::RenderWindow& window, Background& Background) : background(Background)
+	{
+	}
+
 	void processInput(sf::RenderWindow& window)
 	{
 		sf::Event event;

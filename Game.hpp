@@ -16,9 +16,6 @@
 #include "Score.hpp"
 #include "Border.hpp"
 #include "Direction.hpp"
-
-
-
 #include "Screen.hpp"
 #include "ScreensEnum.hpp"
 #include "LevelSelectionScreen.hpp"
@@ -48,12 +45,16 @@ public:
 
 		highScores.readHighScores();
 
-		MenuScreen menu;
-		GameScreen game;
-		LevelSelectionScreen levelSelection;
-		CreditsScreen credits;
-		HighScoreTableScreen highScoreTable(highScores);
-		AddHighScoreScreen addHighScoreScreen(highScores);
+		Background background;
+		background.setBackground("Images/background3.jpg");
+		background.setSize(WindowWidth, WindowHeight);
+
+		MenuScreen menu(window, background);
+		GameScreen game(window, background);
+		LevelSelectionScreen levelSelection(window, background);
+		CreditsScreen credits(window, background);
+		HighScoreTableScreen highScoreTable(window, background, highScores);
+		AddHighScoreScreen addHighScoreScreen(window, background, highScores);
 
 		ScreensEnum currentScreen = ScreensEnum::Menu;
 

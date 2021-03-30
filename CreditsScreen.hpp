@@ -3,11 +3,14 @@
 #include <SFML/Graphics.hpp>
 #include "Screen.hpp"
 #include "Game.hpp"
+#include "Background.hpp"
 
 class CreditsScreen : public Screen
 {
+private:
+	Background background;
 public:
-	CreditsScreen()
+	CreditsScreen(sf::RenderWindow& window, Background& Background) : background(Background)
 	{
 		// Add whatever needs to be setup here.
 	}

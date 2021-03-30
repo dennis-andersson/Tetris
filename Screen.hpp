@@ -12,7 +12,7 @@ public:
 		sf::Event event;
 
 		while (window.pollEvent(event)) {
-			if (event.type == sf::Event::KeyPressed ||
+			if ((event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape) ||
 				event.type == sf::Event::JoystickButtonPressed) {
 				goBack = true;
 				return;
@@ -33,8 +33,10 @@ public:
 		while (window.isOpen()) {
 			processInput(window);
 
-			if (goBack)
+			if (goBack) {
+				goBack = false;
 				return ScreensEnum::Menu;
+			}
 
 			render(window);
 		}
