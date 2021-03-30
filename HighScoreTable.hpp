@@ -45,7 +45,7 @@ public:
 		int counter = 10;
 		while (!file.eof() && counter--) {
 			getline(file, line);
-			file >> Score;
+			file >> Score >> std::ws;
 			HighScores.push_back(HighScore(line, Score));
 		}
 		file.close();
