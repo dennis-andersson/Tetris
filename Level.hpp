@@ -11,14 +11,13 @@ class Level
 public:
 	Level()
 	{
-		currentLevel = 1;
-		speed = sf::seconds(speedFactor * currentLevel);
+		reset();
 	}
 
-	void setLevel(int level)
+	void reset()
 	{
-		// Store the level in a variable and calculate the game speed.
-		currentLevel = level;
+		currentLevel = 1;
+		speed = sf::seconds(speedFactor * currentLevel);
 	}
 
 	int getLevel()

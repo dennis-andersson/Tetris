@@ -14,6 +14,7 @@ class Sound
 private:
 	static const int numberOfSoundEffects{ 5 };
 	std::array<sf::SoundBuffer, Sound::numberOfSoundEffects> effects;
+	sf::Music menuMusic;
 	sf::Music backgroundMusic;
 	sf::Sound sound;
 
@@ -80,12 +81,14 @@ public:
 
 	void playMenuMusic()
 	{
-
+		if (!menuMusic.openFromFile("Sounds/menu.wav"))
+			return;
+		menuMusic.play();
 	}
 
 	void stopMenuMusic()
 	{
-
+		menuMusic.stop();
 	}
 
 	void playBackgroundMusic()
@@ -97,13 +100,11 @@ public:
 
 	void pauseBackgroundMusic()
 	{
-
 		backgroundMusic.pause();
 	}
 
 	void stopBackgroundMusic()
 	{
-
 		backgroundMusic.pause();
 	}
 
