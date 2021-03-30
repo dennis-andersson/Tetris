@@ -7,7 +7,7 @@ class Screen
 private:
 	bool goBack{ false };
 public:
-	void processInput(sf::RenderWindow& window)
+	virtual void processInput(sf::RenderWindow& window)
 	{
 		sf::Event event;
 
@@ -20,9 +20,9 @@ public:
 		}
 	}
 
-	void update(const sf::Time& deltaTime) {};
+	virtual void update(const sf::Time& deltaTime) {};
 
-	void render(sf::RenderWindow& window)
+	virtual void render(sf::RenderWindow& window)
 	{
 		window.clear();
 		window.display();
