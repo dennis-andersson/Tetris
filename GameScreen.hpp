@@ -19,6 +19,7 @@
 #include "ScreensEnum.hpp"
 #include "Screen.hpp"
 #include "Input.hpp"
+#include "Background.hpp"
 
 enum GameMode
 {
@@ -31,6 +32,8 @@ private:
 	int WindowWidth;
 	int WindowHeight;
 	HighScoreTable highScores;
+	GameMode mode;
+	Background background;
 
 	// Stack area
 	// 15 x 30 blocks
@@ -101,8 +104,42 @@ private:
 			blocks.push_back(sf::Sprite(blockTextures, sf::IntRect(i * BlockSize, 0, BlockSize, BlockSize)));
 	}
 
-	void setup()
+	void newShapes()
 	{
+		newShape(currentShape, shapeFirstPosition, nextShape.getId());
+		newShape(nextShape, nextShapePosition);
+	}
+
+	void newShape(Tetromino& shape, sf::Vector2i position, int newId)
+	{
+		shape.newShape(newId);
+		shape.setBlocksSprite(blocks[newId]);
+		shape.setPosition(position);
+		shape.setVisible(true);
+	}
+
+	void newShape(Tetromino& shape, sf::Vector2i position)
+	{
+		newShape(shape, position, getRandomShapeId());
+	}
+
+	void drawTextElements(sf::RenderWindow& window)
+	{
+		for (auto te : fixedTextElements)
+			te.draw(window);
+
+		scoreText.draw(window, currentScore.score);
+		levelText.draw(window, currentLevel.getLevel());
+		linesText.draw(window, linesCleared);
+		gameOverText.draw(window);
+		pausedText.draw(window);
+	}
+public:
+	GameScreen(sf::RenderWindow& window, Background& Background) : background(Background)
+	{
+		WindowWidth = window.getSize().x;
+		WindowHeight = window.getSize().y;
+
 		generateBlocks();
 
 		// Setup grid
@@ -151,41 +188,8 @@ private:
 
 		// Load sound effects
 		sound.loadSoundEffects();
-
-		initialized = true;
 	}
 
-	void newShapes()
-	{
-		newShape(currentShape, shapeFirstPosition, nextShape.getId());
-		newShape(nextShape, nextShapePosition);
-	}
-
-	void newShape(Tetromino& shape, sf::Vector2i position, int newId)
-	{
-		shape.newShape(newId);
-		shape.setBlocksSprite(blocks[newId]);
-		shape.setPosition(position);
-		shape.setVisible(true);
-	}
-
-	void newShape(Tetromino& shape, sf::Vector2i position)
-	{
-		newShape(shape, position, getRandomShapeId());
-	}
-
-	void drawTextElements(sf::RenderWindow& window)
-	{
-		for (auto te : fixedTextElements)
-			te.draw(window);
-
-		scoreText.draw(window, currentScore.score);
-		levelText.draw(window, currentLevel.getLevel());
-		linesText.draw(window, linesCleared);
-		gameOverText.draw(window);
-		pausedText.draw(window);
-	}
-public:
 	sf::Sprite& getBlock(int blockId)
 	{
 		return blocks[blockId];
@@ -439,16 +443,8 @@ public:
 			currentShape.revertState();
 	}
 
-	GameMode mode;
-
 	ScreensEnum run(sf::RenderWindow& window)
 	{
-		WindowWidth = window.getSize().x;
-		WindowHeight = window.getSize().y;
-
-		if (!initialized)
-			setup();
-
 		while (!endGame) {
 			// TODO: Play some music to entertain the player.
 

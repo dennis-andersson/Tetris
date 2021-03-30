@@ -5,13 +5,16 @@
 #include "Screen.hpp"
 #include "Game.hpp"
 #include "HighScoreTable.hpp"
+#include "TextElement.hpp"
+#include "Background.hpp"
 
 class HighScoreTableScreen : public Screen
 {
 private:
 	HighScoreTable highScores;
+	Background background;
 public:
-	HighScoreTableScreen(HighScoreTable& HighScores) : highScores(HighScores)
+	HighScoreTableScreen(sf::RenderWindow& window, Background& Background, HighScoreTable& HighScores) : background(Background), highScores(HighScores)
 	{
 		// Add whatever needs to be setup here.
 	}
