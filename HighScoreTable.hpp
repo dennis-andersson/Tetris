@@ -30,7 +30,8 @@ struct HighScore
 
 class HighScoreTable
 {
-	std::string filename{ "highscores.dat" };
+	const std::string filename{ "highscores.dat" };
+	const int limit{ 10 };
 public:
 	std::vector<HighScore> HighScores;
 
@@ -64,7 +65,20 @@ public:
 
 	void addHighScore(std::string name, int score)
 	{
+		if (!isScoreHighEnough(score))
+			return;
+
 		// Create an instance of HighScore and insert the new high score in sorted order.
+		auto newHighScore{ HighScore(name, score) };
+
+		for (auto it = HighScores.begin(); it != HighScores.end(); ++it) {
+			if (score > (*it).Score) {
+				HighScores.insert(it, newHighScore);
+				return;
+			}
+		}
+
+		HighScores.push_back(newHighScore);
 	}
 
 	bool isScoreHighEnough(int Score)
@@ -72,6 +86,9 @@ public:
 		// We should probably have a limit of high scores, say 10-15 maybe.
 		// Compare the score with the high scores and return true if the score
 		// is high enough to add to the high score table.
+
+		if (HighScores.size() < limit) return true;
+		if (HighScores[HighScores.size() - 1].Score < Score) return true;
 	}
 };
 
