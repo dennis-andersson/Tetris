@@ -329,6 +329,9 @@ public:
 				currentScore.addSoftScore(10);
 				int rowsToRemove = grid.markLinesForRemoval();
 
+				// TODO: Play a sound effect based on the number of rows cleared.
+
+
 				if (rowsToRemove) {
 					currentScore.addPoints(rowsToRemove, currentLevel.getLevel());
 					linesCleared += rowsToRemove;
