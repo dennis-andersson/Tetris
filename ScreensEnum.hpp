@@ -2,6 +2,6 @@
 
 enum ScreensEnum
 {
-	Menu, LevelSelection, Play, HighScores, Credits, None
+	Menu, LevelSelection, Play, HighScores, AddHighScore, Credits, None
 };
 

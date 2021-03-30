@@ -25,6 +25,7 @@
 #include "GameScreen.hpp"
 #include "HighScoreTableScreen.hpp"
 #include "CreditsScreen.hpp"
+#include "AddHighScoreScreen.hpp"
 
 class Game
 {
@@ -52,6 +53,7 @@ public:
 		LevelSelectionScreen levelSelection;
 		CreditsScreen credits;
 		HighScoreTableScreen highScoreTable(highScores);
+		AddHighScoreScreen addHighScoreScreen(highScores);
 
 		ScreensEnum currentScreen = ScreensEnum::Menu;
 

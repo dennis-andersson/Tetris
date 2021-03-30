@@ -87,5 +87,10 @@ public:
 
 		text.setOrigin(bounds.width / 2, bounds.height / 2);
 	}
+
+	void setPosition(sf::Vector2f newPosition)
+	{
+		text.setPosition(newPosition);
+	}
 };
 
