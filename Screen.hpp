@@ -16,6 +16,7 @@ private:
 	static inline const sf::Vector2f backButtonPosition{25, 510};
 	static inline sf::FloatRect backButtonBoundingBox;
 public:
+
 	Screen(sf::RenderWindow& window)
 	{
 		if (backButtonTexture.getSize().x == 0) {

@@ -45,6 +45,8 @@ public:
 
 		highScores.readHighScores();
 
+		Sound::GetInstance().loadSoundEffects();
+
 		MenuScreen menu(window);
 		GameScreen game(window);
 		LevelSelectionScreen levelSelection(window);

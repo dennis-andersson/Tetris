@@ -6,21 +6,36 @@
 
 enum SoundEffect 
 {
-	Pause, SoftDrop, HardDrop, LinesCleared, Tetris
+	Pause, SoftDrop, HardDrop, Rotate, LinesCleared, Tetris
 };
 
 class Sound
 {
+protected:
+	Sound() {}
+	~Sound() {}
+
+	static Sound* soundInstance;
+	
 private:
-	static const int numberOfSoundEffects{ 5 };
+	static const int numberOfSoundEffects{ 6 };
 	std::array<sf::SoundBuffer, Sound::numberOfSoundEffects> effects;
 	sf::Music menuMusic;
 	sf::Music backgroundMusic;
 	sf::Sound sound;
 
 public:
-	Sound() {}
-	~Sound() {}
+	Sound(Sound& other) = delete;
+	
+	void operator=(const Sound&) = delete;
+
+	static Sound& GetInstance()
+	{
+		if (soundInstance == nullptr)
+			soundInstance = new Sound;
+		return *(soundInstance);
+	}
+
 
 	void playSound()
 	{
@@ -74,16 +89,29 @@ public:
 		effects[SoundEffect::Pause].loadFromFile("Sounds/pause.wav");
 
 		// SoftDrop
+		effects[SoundEffect::SoftDrop].loadFromFile("Sounds/line-drop.wav");
+
 		// HardDrop
+		effects[SoundEffect::HardDrop].loadFromFile("Sounds/force-hit.wav");
+
+		// Rotate
+		effects[SoundEffect::Rotate].loadFromFile("Sounds/block-rotate.wav");
+
 		// LinesCleared
+		effects[SoundEffect::LinesCleared].loadFromFile("Sounds/line-remove.wav");
+
 		// Tetris
+		effects[SoundEffect::Tetris].loadFromFile("Sounds/line-remove.wav");
 	}
 
 	void playMenuMusic()
 	{
-		if (!menuMusic.openFromFile("Sounds/menu.wav"))
-			return;
-		menuMusic.play();
+		if (menuMusic.getStatus() != sf::SoundSource::Status::Playing) {
+			if (!menuMusic.openFromFile("Sounds/menu.ogg"))
+				return;
+			menuMusic.setLoop(true);
+			menuMusic.play();
+		}
 	}
 
 	void stopMenuMusic()
@@ -93,9 +121,12 @@ public:
 
 	void playBackgroundMusic()
 	{
-		if (!backgroundMusic.openFromFile("music.wav"))
-			return;
-		backgroundMusic.play();
+		if (backgroundMusic.getStatus() != sf::SoundSource::Status::Playing) {
+			if (!backgroundMusic.openFromFile("Sounds/music.ogg"))
+				return;
+			backgroundMusic.setLoop(true);
+			backgroundMusic.play();
+		}
 	}
 
 	void pauseBackgroundMusic()
@@ -105,12 +136,13 @@ public:
 
 	void stopBackgroundMusic()
 	{
-		backgroundMusic.pause();
+		backgroundMusic.stop();
 	}
 
-	void nextLevelReached()
+	/*void nextLevelReached()
 	{
 
-	}
+	}*/
 };
 
+Sound* Sound::soundInstance = nullptr;
