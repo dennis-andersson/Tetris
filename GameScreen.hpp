@@ -322,14 +322,13 @@ public:
 				currentScore.addSoftScore(10);
 				int rowsToRemove = grid.markLinesForRemoval();
 
-				// TODO: Play a sound effect based on the number of rows cleared.
-				Sound::GetInstance().playSoundEffect(rowsToRemove == 4 ? SoundEffect::Tetris : SoundEffect::LinesCleared);
-
 				if (rowsToRemove) {
+					Sound::GetInstance().playSoundEffect(rowsToRemove == 4 ? SoundEffect::Tetris : SoundEffect::LinesCleared);
 					currentScore.addPoints(rowsToRemove, currentLevel.getLevel());
 					linesCleared += rowsToRemove;
 					mode = GameMode::RemovingLines;
 				} else {
+					Sound::GetInstance().playSoundEffect(SoundEffect::SoftDrop);
 					newShapes();
 					if (!canMove(currentShape.getBlockPositions()))
 						gameOver();
@@ -443,7 +442,6 @@ public:
 
 	ScreensEnum run(sf::RenderWindow& window)
 	{
-		// TODO: Play some music to entertain the player.
 		Sound::GetInstance().stopMenuMusic();
 		Sound::GetInstance().playBackgroundMusic();
 
