@@ -19,6 +19,7 @@ public:
 
 		texture.setRepeated(true);
 		sprite.setTexture(texture);
+		loaded = true;
 	}
 
 	void setSize(int Width, int Height)
@@ -30,9 +31,15 @@ public:
 	{
 		window.draw(sprite);
 	}
+
+	bool isLoaded()
+	{
+		return loaded;
+	}
 private:
 	sf::Texture texture;
 	sf::Sprite sprite;
+	bool loaded{ false };
 };
 
 

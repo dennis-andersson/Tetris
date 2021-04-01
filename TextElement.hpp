@@ -6,8 +6,8 @@
 class TextElement
 {
 private:
-	static bool fontLoaded;
-	static sf::Font font;
+	static inline bool fontLoaded = false;
+	static inline sf::Font font;
 	sf::Text text;
 	bool visible{ true };
 public:
@@ -22,7 +22,6 @@ public:
 	{
 		init(position, size, color, style);
 		text.setString(s);
-
 	}
 
 	void init(sf::Vector2f position, int size, sf::Color color, sf::Uint32 style)
@@ -48,7 +47,6 @@ public:
 
 	void draw(sf::RenderWindow &window)
 	{
-		text.setFont(TextElement::font);
 		if (visible)
 			window.draw(text);
 	}
@@ -97,7 +95,10 @@ public:
 	{
 		text.setPosition(newPosition);
 	}
+
+	sf::FloatRect getBoundingBox()
+	{
+		return text.getGlobalBounds();
+	}
 };
 
-sf::Font TextElement::font;
-bool TextElement::fontLoaded = false;

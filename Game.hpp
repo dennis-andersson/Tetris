@@ -45,16 +45,12 @@ public:
 
 		highScores.readHighScores();
 
-		Background background;
-		background.setBackground("Images/background3.jpg");
-		background.setSize(WindowWidth, WindowHeight);
-
-		MenuScreen menu(window, background);
-		GameScreen game(window, background);
-		LevelSelectionScreen levelSelection(window, background);
-		CreditsScreen credits(window, background);
-		HighScoreTableScreen highScoreTable(window, background, highScores);
-		AddHighScoreScreen addHighScoreScreen(window, background, highScores);
+		MenuScreen menu(window);
+		GameScreen game(window);
+		LevelSelectionScreen levelSelection(window);
+		CreditsScreen credits(window);
+		HighScoreTableScreen highScoreTable(window, highScores);
+		AddHighScoreScreen addHighScoreScreen(window, highScores);
 
 		ScreensEnum currentScreen = ScreensEnum::Menu;
 
