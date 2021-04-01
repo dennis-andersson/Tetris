@@ -12,7 +12,6 @@ class MenuScreen : public Screen
 {
 private:
 	sf::FloatRect menuOptionsBoundingBox;
-
 	sf::Color selectedOptionColor{ sf::Color::Yellow };
 	sf::Color nonSelectedOptionColor{ sf::Color::White };
 	static const int numberOfOptions{ 4 };
@@ -228,7 +227,7 @@ public:
 		for (int i = 0; i < numberOfOptions; ++i)
 			options[i].draw(window);
 
-		if (true)
+		if (false)
 			drawBoundingBoxes(window);
 
 		window.display();
