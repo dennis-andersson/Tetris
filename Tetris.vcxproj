@@ -187,6 +187,7 @@
     <ClInclude Include="Sound.hpp" />
     <ClInclude Include="Tetromino.hpp" />
     <ClInclude Include="TextElement.hpp" />
+    <ClInclude Include="Utils.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Tetris.rc" />
