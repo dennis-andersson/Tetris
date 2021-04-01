@@ -1,10 +1,11 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include <array>
 #include "Screen.hpp"
+#include "Sound.hpp"
 #include "Game.hpp"
 #include "TextElement.hpp"
-#include <array>
 #include "Input.hpp"
 #include "Utils.hpp"
 
@@ -235,6 +236,8 @@ public:
 
 	ScreensEnum run(sf::RenderWindow& window)
 	{
+		Sound::GetInstance().playMenuMusic();
+
 		while (window.isOpen()) {
 			processInput(window);
 

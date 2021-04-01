@@ -35,6 +35,7 @@ public:
 
 	ScreensEnum run(sf::RenderWindow& window)
 	{
+		Sound::GetInstance().stopMenuMusic();
 		return ScreensEnum::Play;
 		//while (window.isOpen()) {
 		//	processInput(window);

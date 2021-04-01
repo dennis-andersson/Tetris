@@ -75,8 +75,6 @@ private:
 	int linesCleared{ 0 };
 	Level currentLevel;
 
-	Sound sound;
-
 	bool initialized{ false };
 	bool endGame{ false };
 
@@ -183,9 +181,6 @@ public:
 		currentShape.setOffset(borderPosition);
 		newShape(currentShape, shapeFirstPosition);
 		newShape(nextShape, nextShapePosition);
-
-		// Load sound effects
-		sound.loadSoundEffects();
 	}
 
 	sf::Sprite& getBlock(int blockId)
@@ -328,7 +323,7 @@ public:
 				int rowsToRemove = grid.markLinesForRemoval();
 
 				// TODO: Play a sound effect based on the number of rows cleared.
-
+				Sound::GetInstance().playSoundEffect(rowsToRemove == 4 ? SoundEffect::Tetris : SoundEffect::LinesCleared);
 
 				if (rowsToRemove) {
 					currentScore.addPoints(rowsToRemove, currentLevel.getLevel());
@@ -442,17 +437,23 @@ public:
 
 		if (!canMove(currentShape.getBlockPositions()))
 			currentShape.revertState();
+		else
+			Sound::GetInstance().playSoundEffect(SoundEffect::Rotate);
 	}
 
 	ScreensEnum run(sf::RenderWindow& window)
 	{
-		while (!endGame) {
-			// TODO: Play some music to entertain the player.
+		// TODO: Play some music to entertain the player.
+		Sound::GetInstance().stopMenuMusic();
+		Sound::GetInstance().playBackgroundMusic();
 
+		while (!endGame) {
 			resetGame();
 			GameLoop(window);
 		}
 		endGame = false;
+
+		Sound::GetInstance().stopBackgroundMusic();
 
 		return ScreensEnum::Menu;
 	}
@@ -471,6 +472,8 @@ public:
 
 	void pauseGame()
 	{
+		Sound::GetInstance().pauseBackgroundMusic();
+		Sound::GetInstance().playSoundEffect(SoundEffect::Pause);
 		mode = (mode == GameMode::Running) ? GameMode::Paused : GameMode::Running;
 		pausedText.toggleVisible();
 		makeRoomForText();
