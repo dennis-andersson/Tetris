@@ -2,12 +2,25 @@
 
 #include <SFML/Graphics.hpp>
 
-bool gamepadButtonPressed()
+enum class GamepadButtons
 {
-	unsigned int buttonCount = sf::Joystick::getButtonCount(0);
-	bool buttonPressed{ false };
-	for (int i = 0; i < sf::Joystick::getButtonCount(0); ++i)
-		buttonPressed |= sf::Joystick::isButtonPressed(0, i);
-	return buttonPressed;
+	A, B, X, Y, LeftShoulder, RightShoulder, ViewB, MenuB, LeftStick, RightStick
+};
+
+GamepadButtons gamepadButton(unsigned int button)
+{
+	const int numberOfButtons{ 10 };
+	const GamepadButtons buttons[numberOfButtons]{ GamepadButtons::A,
+												   GamepadButtons::B,
+												   GamepadButtons::X,
+												   GamepadButtons::Y,
+												   GamepadButtons::LeftShoulder,
+												   GamepadButtons::RightShoulder,
+												   GamepadButtons::ViewB,
+												   GamepadButtons::MenuB,
+												   GamepadButtons::LeftStick,
+												   GamepadButtons::RightStick };
+
+	return buttons[button];
 }
 

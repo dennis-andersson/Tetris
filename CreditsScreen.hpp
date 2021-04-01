@@ -3,14 +3,12 @@
 #include <SFML/Graphics.hpp>
 #include "Screen.hpp"
 #include "Game.hpp"
-#include "Background.hpp"
 #include "TextElement.hpp"
 #include <string>
 
 class CreditsScreen : public Screen
 {
 private:
-	Background background;
 	TextElement Credits;
 	TextElement text[4];
 	std::string name[4] = { "Dennis", "Ali", "Nuri", "Leila" };
@@ -19,7 +17,7 @@ private:
 	sf::Color textColor{ sf::Color::White };
 	sf::Uint8 textStyle{ sf::Text::Style::Regular };
 public:
-	CreditsScreen(sf::RenderWindow& window, Background& Background) : background(Background)
+	CreditsScreen(sf::RenderWindow& window) : Screen(window)
 	{
 		// Add whatever needs to be setup here.
 		position.x = window.getSize().x / 2;	// Center of the window
@@ -54,7 +52,8 @@ public:
 		window.clear();		// Clear the window
 
 		// Draw stuff here.
-		background.draw(window);	// Draw background image
+		drawBackground(window);		// Draw background image
+		drawBackButton(window);		// Draw back button
 
 		for (int i = 0; i < 4; i++)
 		{

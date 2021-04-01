@@ -4,12 +4,10 @@
 #include "HighScoreTable.hpp"
 #include "Screen.hpp"
 #include "TextElement.hpp"
-#include "Background.hpp"
 
 class AddHighScoreScreen : public Screen
 {
 private:
-	Background background;
 	HighScoreTable highScores;
 	TextElement header;
 	std::string headerText{ "Please enter your name" };
@@ -18,7 +16,7 @@ private:
 	sf::Uint8 textStyle{ sf::Text::Style::Regular };
 	int textSize{ 36 };
 public:
-	AddHighScoreScreen(sf::RenderWindow& window, Background& Background, HighScoreTable& HighScores) : background(Background), highScores(HighScores)
+	AddHighScoreScreen(sf::RenderWindow& window, HighScoreTable& HighScores) : Screen(window), highScores(HighScores)
 	{
 		header.init(headerText, headerPosition, textSize, textColor, textStyle);
 	}
@@ -58,6 +56,7 @@ public:
 	{
 		window.clear();
 		header.draw(window);
+		drawBackground(window);
 		window.display();
 	}
 

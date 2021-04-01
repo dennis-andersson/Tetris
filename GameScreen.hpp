@@ -19,7 +19,6 @@
 #include "ScreensEnum.hpp"
 #include "Screen.hpp"
 #include "Input.hpp"
-#include "Background.hpp"
 
 enum GameMode
 {
@@ -33,7 +32,6 @@ private:
 	int WindowHeight;
 	HighScoreTable highScores;
 	GameMode mode;
-	Background background;
 
 	// Stack area
 	// 15 x 30 blocks
@@ -135,7 +133,7 @@ private:
 		pausedText.draw(window);
 	}
 public:
-	GameScreen(sf::RenderWindow& window, Background& Background) : background(Background)
+	GameScreen(sf::RenderWindow& window) : Screen(window)
 	{
 		WindowWidth = window.getSize().x;
 		WindowHeight = window.getSize().y;
@@ -382,10 +380,8 @@ public:
 		rotateShape = false;
 		direction = Direction::None;
 		while (window.pollEvent(event)) {
-			if (event.type == sf::Event::Closed) {
-				window.close();
-			}
-			else if (event.type == sf::Event::KeyPressed) {
+			switch (event.type) {
+			case sf::Event::KeyPressed:
 				switch (event.key.code) {
 				case sf::Keyboard::Left:
 					direction = Direction::Left;
@@ -411,14 +407,12 @@ public:
 					currentLevel.nextLevel(currentScore.score);
 					break;
 				}
-			}
-
-			if (sf::Joystick::isConnected(0)) {
-				bool buttonPressed = gamepadButtonPressed();
-
-				if (buttonPressed)
+				break;
+			case sf::Event::JoystickButtonPressed:
+				if (gamepadButton(event.joystickButton.button) == GamepadButtons::A)
 					rotateShape = true;
-
+				break;
+			case sf::Event::JoystickMoved:
 				X = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::X);
 				Y = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Y);
 
@@ -434,6 +428,10 @@ public:
 				if (X < -limit)	direction = Direction::Left;
 				if (Y > limit)	direction = Direction::SoftDown;
 				if (Y < -limit)	rotateShape = true;
+				break;
+			case sf::Event::Closed:
+				window.close();
+				break;
 			}
 		}
 	}
