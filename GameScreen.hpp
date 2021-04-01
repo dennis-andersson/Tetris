@@ -447,6 +447,7 @@ public:
 		Sound::GetInstance().stopMenuMusic();
 		Sound::GetInstance().playBackgroundMusic();
 
+		window.setMouseCursorVisible(false);
 		while (!endGame) {
 			resetGame();
 			GameLoop(window);
@@ -454,6 +455,8 @@ public:
 		endGame = false;
 
 		Sound::GetInstance().stopBackgroundMusic();
+
+		window.setMouseCursorVisible(true);
 
 		return ScreensEnum::Menu;
 	}
