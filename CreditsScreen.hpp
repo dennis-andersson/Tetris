@@ -5,14 +5,17 @@
 #include "Game.hpp"
 #include "Background.hpp"
 #include "TextElement.hpp"
+#include <string>
 
 class CreditsScreen : public Screen
 {
 private:
 	Background background;
-	TextElement test;
+	TextElement Credits;
+	TextElement text[4];
+	std::string name[4] = { "Dennis", "Ali", "Nuri", "Leila" };
 	sf::Vector2f position;
-	int textSize{ 32 };
+	int textSize{ 35 };
 	sf::Color textColor{ sf::Color::White };
 	sf::Uint8 textStyle{ sf::Text::Style::Regular };
 public:
@@ -20,10 +23,23 @@ public:
 	{
 		// Add whatever needs to be setup here.
 		position.x = window.getSize().x / 2;	// Center of the window
-		position.y = 100;
+		//position.y = 200;
 
-		test.init("Test", position, textSize, textColor, textStyle);	// Set various properties
-		test.setOriginToCenter();				// It will be centered around its position
+		position.y = 100;
+		Credits.init("CREDITS", position, textSize, textColor, textStyle);
+		Credits.setOriginToCenter();
+
+		position.y = 200;
+		int textSize{ 25 };
+		for (int i = 0; i < 4; i++)
+		{
+			text[i].init(name[i], position, textSize, textColor, textStyle);
+			// Set various properties // It will be centered around its position
+			text[i].setOriginToCenter();
+			position.y = position.y + 40;
+
+		}
+
 	}
 
 	~CreditsScreen()
@@ -35,12 +51,17 @@ public:
 	// how it's normally implemented.
 	void render(sf::RenderWindow& window)
 	{
-		window.clear();							// Clear the window
+		window.clear();		// Clear the window
 
 		// Draw stuff here.
-		background.draw(window);				// Draw background image
-		test.draw(window);						// Draw example text
+		background.draw(window);	// Draw background image
 
+		for (int i = 0; i < 4; i++)
+		{
+			// Draw example text
+			text[i].draw(window);
+		}
+		Credits.draw(window);
 		window.display();
 	}
 };
