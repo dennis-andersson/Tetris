@@ -31,7 +31,7 @@ private:
 	int WindowWidth;
 	int WindowHeight;
 	HighScoreTable highScores;
-	GameMode mode;
+	std::stack<GameMode> mode;
 
 	// Stack area
 	// 15 x 30 blocks
@@ -75,13 +75,14 @@ private:
 	int linesCleared{ 0 };
 	Level currentLevel;
 
-	bool initialized{ false };
 	bool endGame{ false };
+	bool counterClockwise;
 
 	std::default_random_engine engine{ static_cast<unsigned int>(std::chrono::system_clock::now().time_since_epoch().count()) };
 
 	int getRandomShapeId()
 	{
+		return 6;
 		int n = getRandomNumber(shapes) % shapes;
 		return n;
 	}
@@ -209,7 +210,7 @@ public:
 		}
 
 		// Draw shape
-		if (mode == GameMode::Running) {
+		if (mode.top() == GameMode::Running) {
 			currentShape.draw(window);
 			nextShape.draw(window);
 		}
@@ -236,7 +237,7 @@ public:
 			deltaTime = clock.restart();
 			elapsedTime += deltaTime;
 
-			switch (mode) {
+			switch (mode.top()) {
 			case GameMode::Running:
 				processEvents(window);
 
@@ -257,7 +258,7 @@ public:
 				update(deltaTime);
 				render(window);
 				if (!grid.aboutToRemoveLines())
-					mode = GameMode::Running;
+					mode.pop();
 				break;
 			case GameMode::Paused:
 				processEvents(window);
@@ -273,7 +274,7 @@ public:
 						window.close();
 
 					if (event.type == sf::Event::JoystickButtonPressed) {
-						mode = Running;
+						mode.pop();
 						return;
 					}
 
@@ -281,7 +282,7 @@ public:
 						if (event.key.code == sf::Keyboard::Escape)
 							endGame = true;
 						else
-							mode = Running;
+							mode.pop();
 						return;
 					}
 				}
@@ -298,7 +299,7 @@ public:
 			moveShape(direction);
 
 		if (rotateShape)
-			rotate();
+			rotate(counterClockwise);
 
 		grid.update(deltaTime);
 
@@ -326,7 +327,7 @@ public:
 					Sound::GetInstance().playSoundEffect(rowsToRemove == 4 ? SoundEffect::Tetris : SoundEffect::LinesCleared);
 					currentScore.addPoints(rowsToRemove, currentLevel.getLevel());
 					linesCleared += rowsToRemove;
-					mode = GameMode::RemovingLines;
+					mode.push(GameMode::RemovingLines);
 				} else {
 					Sound::GetInstance().playSoundEffect(SoundEffect::SoftDrop);
 					newShapes();
@@ -341,7 +342,7 @@ public:
 
 	void gameOver()
 	{
-		mode = GameMode::GameOver;
+		mode.push(GameMode::GameOver);
 		gameOverText.setVisible(true);
 		makeRoomForText();
 	}
@@ -374,65 +375,102 @@ public:
 		rotateShape = false;
 		direction = Direction::None;
 		while (window.pollEvent(event)) {
-			switch (event.type) {
-			case sf::Event::KeyPressed:
-				switch (event.key.code) {
-				case sf::Keyboard::Left:
-					direction = Direction::Left;
+			GamepadButtons button;
+			
+			if (event.type == sf::Event::Closed) {
+				window.close();
+				return;
+			}
+
+			if (event.type == sf::Event::JoystickButtonPressed)
+				button = gamepadButton(event.joystickButton.button);
+
+			switch (mode.top()) {
+			case GameMode::Running:
+				switch (event.type) {
+				case sf::Event::KeyPressed:
+					switch (event.key.code) {
+					case sf::Keyboard::Left:
+						direction = Direction::Left;
+						break;
+					case sf::Keyboard::Right:
+						direction = Direction::Right;
+						break;
+					case sf::Keyboard::Down:
+						direction = Direction::SoftDown;
+						break;
+					case sf::Keyboard::Up:
+						rotateShape = true;
+						break;
+					case sf::Keyboard::Escape:
+						endGame = true;
+						break;
+					case sf::Keyboard::P:
+						pauseGame();
+						break;
+					case sf::Keyboard::A:
+						// DEBUG
+						currentScore.addSoftScore(1200);
+						currentLevel.nextLevel(currentScore.score);
+						break;
+					}
 					break;
-				case sf::Keyboard::Right:
-					direction = Direction::Right;
+				case sf::Event::JoystickButtonPressed:
+					switch (button) {
+					case GamepadButtons::MenuB:
+					case GamepadButtons::ViewB:
+						pauseGame();
+						break;
+					case GamepadButtons::A:
+					case GamepadButtons::B:
+					case GamepadButtons::X:
+					case GamepadButtons::Y:
+						rotateShape = true;
+						counterClockwise = (button == GamepadButtons::X || button == GamepadButtons::Y);
+						break;
+					}
 					break;
-				case sf::Keyboard::Down:
-					direction = Direction::SoftDown;
-					break;
-				case sf::Keyboard::Up:
-					rotateShape = true;
-					break;
-				case sf::Keyboard::Escape:
-					endGame = true;
-					break;
-				case sf::Keyboard::P:
-					pauseGame();
-					break;
-				case sf::Keyboard::A:
-					// DEBUG
-					currentScore.addSoftScore(1200);
-					currentLevel.nextLevel(currentScore.score);
+				case sf::Event::JoystickMoved:
+					X = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::X);
+					Y = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Y);
+
+					dpadX = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::PovX);
+					dpadY = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::PovY);
+
+					if (dpadX > 0.5f)	direction = Direction::Right;
+					if (dpadX < -0.5f)	direction = Direction::Left;
+					if (dpadY < -0.5f)	direction = Direction::SoftDown;
+					if (dpadY > 0.5f)	rotateShape = true;
+
+					if (X > limit)	direction = Direction::Right;
+					if (X < -limit)	direction = Direction::Left;
+					if (Y > limit)	direction = Direction::SoftDown;
+					//if (Y < -limit)	rotateShape = true;
 					break;
 				}
 				break;
-			case sf::Event::JoystickButtonPressed:
-				if (gamepadButton(event.joystickButton.button) == GamepadButtons::A)
-					rotateShape = true;
-				break;
-			case sf::Event::JoystickMoved:
-				X = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::X);
-				Y = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Y);
-
-				dpadX = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::PovX);
-				dpadY = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::PovY);
-
-				if (dpadX > 0.5f)	direction = Direction::Right;
-				if (dpadX < -0.5f)	direction = Direction::Left;
-				if (dpadY < -0.5f)	direction = Direction::SoftDown;
-				if (dpadY > 0.5f)	rotateShape = true;
-
-				if (X > limit)	direction = Direction::Right;
-				if (X < -limit)	direction = Direction::Left;
-				if (Y > limit)	direction = Direction::SoftDown;
-				if (Y < -limit)	rotateShape = true;
-				break;
-			case sf::Event::Closed:
-				window.close();
+			case GameMode::Paused:
+			case GameMode::RemovingLines:
+				switch (event.type) {
+				case sf::Event::KeyPressed:
+					if (event.key.code == sf::Keyboard::P)
+						pauseGame();
+					else if (event.key.code == sf::Keyboard::Escape)
+						endGame = true;
+					break;
+				case sf::Event::JoystickButtonPressed:
+					if (button == GamepadButtons::MenuB || button == GamepadButtons::ViewB)
+						pauseGame();
+					break;
+				}
 				break;
 			}
 		}
 	}
 
-	void rotate()
+	void rotate(bool ccw = true)
 	{
-		currentShape.rotate();
+		currentShape.rotate(ccw);
 
 		if (!canMove(currentShape.getBlockPositions()))
 			currentShape.revertState();
@@ -461,7 +499,7 @@ public:
 
 	void resetGame()
 	{
-		mode = GameMode::Running;
+		mode.push(GameMode::Running);
 		gameOverText.setVisible(false);
 		currentScore.score = 0;
 		currentLevel.reset();
@@ -475,9 +513,14 @@ public:
 	{
 		Sound::GetInstance().pauseBackgroundMusic();
 		Sound::GetInstance().playSoundEffect(SoundEffect::Pause);
-		mode = (mode == GameMode::Running) ? GameMode::Paused : GameMode::Running;
+		if (mode.top() == GameMode::Paused) {
+			mode.pop();
+			grid.makeAllRowsVisible();
+		} else {
+			mode.push(GameMode::Paused);
+			makeRoomForText();
+		}
 		pausedText.toggleVisible();
-		makeRoomForText();
 	}
 };
 

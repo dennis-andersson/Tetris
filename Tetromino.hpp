@@ -44,6 +44,8 @@ class Tetromino
 public:
 	void draw(sf::RenderWindow& window)
 	{
+		if (!visible) return;
+
 		for (int i = 0; i < 4; ++i) {
 			sprite.setPosition(offset.x + (block[i].x * 18) + (position.x * 18), offset.y + (block[i].y * 18) + (position.y * 18));
 			window.draw(sprite);
@@ -91,7 +93,7 @@ public:
 		}
 	}
 
-	void rotate()
+	void rotate(bool counterClockwise = false)
 	{
 		//store state of Block in case rotation turns out to be invalid
 		oldBlock = block;
@@ -122,16 +124,31 @@ public:
 			sf::Vector2i oldPoint = block[i];    //pivot
 			sf::Vector2i localVector = oldPoint - sf::Vector2i{ 1,2 };   // 1, 1
 
-			/*//Rotation Matrix
+			/* Clockwise Rotation Matrix
 			 * [cos Degree    -sin Degree]
 			 * [sin Degree     cos Degree]
-			 * translates to
-			 * clockwise
+			 * translates to clockwise
 			 * [0   -1]
 			 * [1    0]
-			 * */
+			 */
 
-			sf::Vector2i nextPoint{ (0 * localVector.x) + (-1 * localVector.y), (1 * localVector.x) + (0 * localVector.y) };
+			 /* Counterclockwise Rotation Matrix
+			  * [cos Degree     sin Degree]
+			  * [-sin Degree    cos Degree]
+			  * translates to counterclockwise
+			  * [0    1]
+			  * [-1   0]
+			  */
+
+			sf::Vector2i nextPoint;
+			if (counterClockwise) {
+				nextPoint.x = (0 * localVector.x) + (1 * localVector.y);
+				nextPoint.y = (-1 * localVector.x) + (0 * localVector.y);
+			} else {
+				nextPoint.x = (0 * localVector.x) + (-1 * localVector.y);
+				nextPoint.y = (1 * localVector.x) + (0 * localVector.y);
+			}
+
 			block[i] = sf::Vector2i{ 1,2 } + nextPoint;
 		}
 	}
