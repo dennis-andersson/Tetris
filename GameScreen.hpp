@@ -82,7 +82,6 @@ private:
 
 	int getRandomShapeId()
 	{
-		return 6;
 		int n = getRandomNumber(shapes) % shapes;
 		return n;
 	}
@@ -401,6 +400,7 @@ public:
 						break;
 					case sf::Keyboard::Up:
 						rotateShape = true;
+						counterClockwise = event.key.control;
 						break;
 					case sf::Keyboard::Escape:
 						endGame = true;
