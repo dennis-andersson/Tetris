@@ -23,7 +23,7 @@
 #include "GameState.hpp"
 
 
-enum GameMode
+enum class GameMode
 {
 	Running, RemovingLines, Paused, GameOver
 };
@@ -319,6 +319,7 @@ public:
 		}
 	}
 
+
 	void update(const sf::Time& deltaTime)
 	{
 		Screen::update(deltaTime);
@@ -326,7 +327,12 @@ public:
 		if (mode.top() == GameMode::Paused)
 			return;
 
-		if (mode.top() != GameMode::RemovingLines && movement.direction != Direction::Down)
+		movement.update(deltaTime.asSeconds());
+
+		//if (mode.top() != GameMode::RemovingLines && movement.direction != Direction::Down)
+		//	moveShape(movement.direction);
+
+		if (mode.top() != GameMode::RemovingLines && movement.source != InputSource::None && movement.readyToMove())
 			moveShape(movement.direction);
 
 		if (rotateShape)
@@ -422,7 +428,7 @@ public:
 					movement.direction = X > 0.f ? Direction::Right : Direction::Left;
 				else
 					if (Y > 0.f)
-						movement.direction = Direction::Down;
+						movement.direction = Direction::SoftDown;
 
 				movement.type = InputType::Stick;
 				movement.source = InputSource::Joystick;
@@ -430,7 +436,6 @@ public:
 		}
 
 		rotateShape = false;
-		//direction = Direction::None;
 		while (window.pollEvent(event)) {
 			if (event.type == sf::Event::Closed) {
 				window.close();

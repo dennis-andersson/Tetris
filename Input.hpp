@@ -20,9 +20,27 @@ struct Movement
 	InputType type;
 	sf::Keyboard::Key key;
 	sf::Joystick::Axis axis;
+	float elapsedTime;
+	float movementPerSecond{14.f};
+
+	void update(float deltaTime)
+	{
+		elapsedTime += deltaTime;
+	}
+
+	bool readyToMove()
+	{
+		if ((elapsedTime * movementPerSecond) >= 1) {
+			elapsedTime = 0.f;
+			return true;
+		} else {
+			return false;
+		}
+	}
 
 	Movement()
 	{
+		elapsedTime = 0.f;
 		reset();
 	}
 

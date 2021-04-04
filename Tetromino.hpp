@@ -130,15 +130,14 @@ public:
 			 * translates to clockwise
 			 * [0   -1]
 			 * [1    0]
+			 *
+			 * Counterclockwise Rotation Matrix
+			 * [cos Degree     sin Degree]
+			 * [-sin Degree    cos Degree]
+			 * translates to counterclockwise
+			 * [0    1]
+			 * [-1   0]
 			 */
-
-			 /* Counterclockwise Rotation Matrix
-			  * [cos Degree     sin Degree]
-			  * [-sin Degree    cos Degree]
-			  * translates to counterclockwise
-			  * [0    1]
-			  * [-1   0]
-			  */
 
 			sf::Vector2i nextPoint;
 			if (counterClockwise) {
