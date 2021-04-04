@@ -97,9 +97,6 @@ public:
 					newScreen();
 					return;
 					break;
-				case sf::Keyboard::S:
-					screenshot(window, "screenshot.png");
-					break;
 				default:
 					Screen::processInput(event);
 					break;

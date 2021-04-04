@@ -91,6 +91,9 @@ public:
 			case sf::Keyboard::Num0:
 				raiseVolume();
 				break;
+			case sf::Keyboard::S:
+				screenshot(GameState::getInstance().Window, "screenshot.png");
+				break;
 			}
 		}
 
