@@ -2,41 +2,23 @@
 
 #include <SFML/Audio.hpp>
 #include <array>
+#include <unordered_map>
 #include <fstream>
 
-enum SoundEffect 
+enum class SoundEffect 
 {
 	Pause, SoftDrop, HardDrop, Rotate, LinesCleared, Tetris
 };
 
 class Sound
 {
-protected:
-	Sound() {}
-	~Sound() {}
-
-	static Sound* soundInstance;
-	
 private:
-	static const int numberOfSoundEffects{ 6 };
-	std::array<sf::SoundBuffer, Sound::numberOfSoundEffects> effects;
+	std::unordered_map<SoundEffect, sf::SoundBuffer> effects;
 	sf::Music menuMusic;
 	sf::Music backgroundMusic;
 	sf::Sound sound;
 
 public:
-	Sound(Sound& other) = delete;
-	
-	void operator=(const Sound&) = delete;
-
-	static Sound& GetInstance()
-	{
-		if (soundInstance == nullptr)
-			soundInstance = new Sound;
-		return *(soundInstance);
-	}
-
-
 	void playSound()
 	{
 		std::ofstream out;
@@ -82,9 +64,6 @@ public:
 
 	void loadSoundEffects()
 	{
-		// I changed effects to an array which might be easier to work with.
-		// You can fill out the rest of the method if you like.
-
 		// Pause
 		effects[SoundEffect::Pause].loadFromFile("Sounds/pause.wav");
 
@@ -145,4 +124,3 @@ public:
 	}*/
 };
 
-Sound* Sound::soundInstance = nullptr;

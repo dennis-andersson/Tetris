@@ -4,20 +4,20 @@
 #include "Background.hpp"
 #include "ScreensEnum.hpp"
 #include "Input.hpp"
+#include "GameState.hpp"
 
 class Screen
 {
 private:
 	bool goBack{ false };
 
-	static inline Background background;
 	static inline sf::Texture backButtonTexture;
 	static inline sf::Sprite goBackButton;
 	static inline const sf::Vector2f backButtonPosition{25, 510};
 	static inline sf::FloatRect backButtonBoundingBox;
 public:
 
-	Screen(sf::RenderWindow& window)
+	Screen()
 	{
 		if (backButtonTexture.getSize().x == 0) {
 			backButtonTexture.loadFromFile("Images/back-button.png");
@@ -28,16 +28,11 @@ public:
 			backButtonBoundingBox.width  = backButtonTexture.getSize().x;
 			backButtonBoundingBox.height = backButtonTexture.getSize().y;
 		}
-
-		if (!background.isLoaded()) {
-			background.setBackground("Images/background3.jpg");
-			background.setSize(window.getSize().x, window.getSize().y);
-		}
 	}
 
 	void drawBackground(sf::RenderWindow& window)
 	{
-		background.draw(window);
+		GameState::getInstance().Background.draw(window);
 	}
 
 	void drawBackButton(sf::RenderWindow& window)
@@ -73,17 +68,17 @@ public:
 		window.display();
 	}
 
-	ScreensEnum run(sf::RenderWindow& window)
+	ScreensEnum run()
 	{
-		while (window.isOpen()) {
-			processInput(window);
+		while (GameState::getInstance().Window.isOpen()) {
+			processInput(GameState::getInstance().Window);
 
 			if (goBack) {
 				goBack = false;
 				return ScreensEnum::Menu;
 			}
 
-			render(window);
+			render(GameState::getInstance().Window);
 		}
 	}
 };

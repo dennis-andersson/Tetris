@@ -2,12 +2,11 @@
 
 #include <SFML/Graphics.hpp>
 #include <string>
+#include "GameState.hpp"
 
 class TextElement
 {
 private:
-	static inline bool fontLoaded = false;
-	static inline sf::Font font;
 	sf::Text text;
 	bool visible{ true };
 public:
@@ -26,16 +25,11 @@ public:
 
 	void init(sf::Vector2f position, int size, sf::Color color, sf::Uint32 style)
 	{
-		if (!fontLoaded) {
-			TextElement::font.loadFromFile("Fonts/arial.ttf");
-			TextElement::fontLoaded = true;
-		}
-
 		text.setCharacterSize(size);
 		text.setPosition(position);
 		text.setFillColor(color);
 		text.setStyle(style);
-		text.setFont(TextElement::font);
+		text.setFont(GameState::getInstance().Font);
 		visible = true;
 	}
 

@@ -23,6 +23,7 @@
 #include "HighScoreTableScreen.hpp"
 #include "CreditsScreen.hpp"
 #include "AddHighScoreScreen.hpp"
+#include "GameState.hpp"
 
 class Game
 {
@@ -37,46 +38,43 @@ private:
 public:
 	void Run()
 	{
-		window.create(sf::VideoMode(WindowWidth, WindowHeight), windowTitle);
-		window.setFramerateLimit(60);
-
 		titleBarIcon.loadFromFile("Icons/tetris.png");
-		window.setIcon(titleBarIcon.getSize().x, titleBarIcon.getSize().y, titleBarIcon.getPixelsPtr());
+		GameState::getInstance().Window.create(sf::VideoMode(WindowWidth, WindowHeight), windowTitle);
+		GameState::getInstance().Window.setFramerateLimit(60);
+		GameState::getInstance().Window.setIcon(titleBarIcon.getSize().x, titleBarIcon.getSize().y, titleBarIcon.getPixelsPtr());
+		GameState::getInstance().HighScoreTable.readHighScores();
+		GameState::getInstance().Sound.loadSoundEffects();
 
-		highScores.readHighScores();
-
-		Sound::GetInstance().loadSoundEffects();
-
-		MenuScreen menu(window);
-		GameScreen game(window);
-		LevelSelectionScreen levelSelection(window);
-		CreditsScreen credits(window);
-		HighScoreTableScreen highScoreTable(window, highScores);
-		AddHighScoreScreen addHighScoreScreen(window, highScores);
+		MenuScreen menu;
+		GameScreen game;
+		LevelSelectionScreen levelSelection;
+		CreditsScreen credits;
+		HighScoreTableScreen highScoreTable;
+		AddHighScoreScreen addHighScoreScreen;
 
 		ScreensEnum currentScreen = ScreensEnum::Menu;
 
 		while (currentScreen != ScreensEnum::None) {
 			switch (currentScreen) {
 			case ScreensEnum::Menu:
-				currentScreen = menu.run(window);
+				currentScreen = menu.run();
 				break;
 			case ScreensEnum::Play:
-				currentScreen = game.run(window);
+				currentScreen = game.run();
 				break;
 			case ScreensEnum::LevelSelection:
-				currentScreen = levelSelection.run(window);
+				currentScreen = levelSelection.run();
 				break;
 			case ScreensEnum::HighScores:
-				currentScreen = highScoreTable.run(window);
+				currentScreen = highScoreTable.run();
 				break;
 			case ScreensEnum::Credits:
-				currentScreen = credits.run(window);
+				currentScreen = credits.run();
 				break;
 			}
 		}
 
-		highScores.saveHighScores();
+		GameState::getInstance().HighScoreTable.saveHighScores();
 	}
 };
 

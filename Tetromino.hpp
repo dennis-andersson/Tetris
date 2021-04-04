@@ -98,7 +98,7 @@ public:
 		//store state of Block in case rotation turns out to be invalid
 		oldBlock = block;
 
-		if (id == BlockNames::Square) //square: no need for rotation
+		if (id == BlockNames::Square) // square: no need for rotation
 			return;
 
 		if (id == BlockNames::I) { // I: restrict "rotation" to two states (horizontal/vertical)

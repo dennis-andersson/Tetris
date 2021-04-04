@@ -19,6 +19,8 @@
 #include "ScreensEnum.hpp"
 #include "Screen.hpp"
 #include "Input.hpp"
+#include "GameState.hpp"
+
 
 enum GameMode
 {
@@ -131,10 +133,10 @@ private:
 		pausedText.draw(window);
 	}
 public:
-	GameScreen(sf::RenderWindow& window) : Screen(window)
+	GameScreen()
 	{
-		WindowWidth = window.getSize().x;
-		WindowHeight = window.getSize().y;
+		WindowWidth = GameState::getInstance().WindowWidth;
+		WindowHeight = GameState::getInstance().WindowHeight;
 
 		generateBlocks();
 
@@ -323,12 +325,12 @@ public:
 				int rowsToRemove = grid.markLinesForRemoval();
 
 				if (rowsToRemove) {
-					Sound::GetInstance().playSoundEffect(rowsToRemove == 4 ? SoundEffect::Tetris : SoundEffect::LinesCleared);
+					GameState::getInstance().Sound.playSoundEffect(rowsToRemove == 4 ? SoundEffect::Tetris : SoundEffect::LinesCleared);
 					currentScore.addPoints(rowsToRemove, currentLevel.getLevel());
 					linesCleared += rowsToRemove;
 					mode.push(GameMode::RemovingLines);
 				} else {
-					Sound::GetInstance().playSoundEffect(SoundEffect::SoftDrop);
+					GameState::getInstance().Sound.playSoundEffect(SoundEffect::SoftDrop);
 					newShapes();
 					if (!canMove(currentShape.getBlockPositions()))
 						gameOver();
@@ -475,24 +477,24 @@ public:
 		if (!canMove(currentShape.getBlockPositions()))
 			currentShape.revertState();
 		else
-			Sound::GetInstance().playSoundEffect(SoundEffect::Rotate);
+			GameState::getInstance().Sound.playSoundEffect(SoundEffect::Rotate);
 	}
 
-	ScreensEnum run(sf::RenderWindow& window)
+	ScreensEnum run()
 	{
-		Sound::GetInstance().stopMenuMusic();
-		Sound::GetInstance().playBackgroundMusic();
+		GameState::getInstance().Sound.stopMenuMusic();
+		GameState::getInstance().Sound.playBackgroundMusic();
 
-		window.setMouseCursorVisible(false);
+		GameState::getInstance().Window.setMouseCursorVisible(false);
 		while (!endGame) {
 			resetGame();
-			GameLoop(window);
+			GameLoop(GameState::getInstance().Window);
 		}
 		endGame = false;
 
-		Sound::GetInstance().stopBackgroundMusic();
+		GameState::getInstance().Sound.stopBackgroundMusic();
 
-		window.setMouseCursorVisible(true);
+		GameState::getInstance().Window.setMouseCursorVisible(true);
 
 		return ScreensEnum::Menu;
 	}
@@ -511,8 +513,8 @@ public:
 
 	void pauseGame()
 	{
-		Sound::GetInstance().pauseBackgroundMusic();
-		Sound::GetInstance().playSoundEffect(SoundEffect::Pause);
+		GameState::getInstance().Sound.pauseBackgroundMusic();
+		GameState::getInstance().Sound.playSoundEffect(SoundEffect::Pause);
 		if (mode.top() == GameMode::Paused) {
 			mode.pop();
 			grid.makeAllRowsVisible();

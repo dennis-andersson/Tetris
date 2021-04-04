@@ -172,6 +172,7 @@
     <ClInclude Include="CreditsScreen.hpp" />
     <ClInclude Include="Direction.hpp" />
     <ClInclude Include="Game.hpp" />
+    <ClInclude Include="GameState.hpp" />
     <ClInclude Include="Grid.hpp" />
     <ClInclude Include="HighScoreTable.hpp" />
     <ClInclude Include="HighScoreTableScreen.hpp" />

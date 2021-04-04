@@ -8,6 +8,7 @@
 #include "TextElement.hpp"
 #include "Input.hpp"
 #include "Utils.hpp"
+#include "GameState.hpp"
 
 class MenuScreen : public Screen
 {
@@ -23,14 +24,12 @@ private:
 	int option{ 0 };
 	std::array<TextElement, MenuScreen::numberOfOptions> options;
 	TextElement title;
-	int Width, Height;
 public:
-	MenuScreen(sf::RenderWindow& window) : Screen(window)
+	MenuScreen()
 	{
-		sf::Vector2u windowSize = window.getSize();
+		int Width{ GameState::getInstance().WindowWidth };
+		int Height{ GameState::getInstance().WindowHeight };
 		std::array<sf::Vector2f, numberOfOptions> positions;
-		Width = windowSize.x;
-		Height = windowSize.y;
 
 		title.init(std::string("TETRIS"), sf::Vector2f(Width / 2, Height * 0.1f), textSize * 3, nonSelectedOptionColor, sf::Text::Bold);
 		title.setOriginToCenter();
@@ -234,19 +233,19 @@ public:
 		window.display();
 	}
 
-	ScreensEnum run(sf::RenderWindow& window)
+	ScreensEnum run()
 	{
-		Sound::GetInstance().playMenuMusic();
+		GameState::getInstance().Sound.playMenuMusic();
 
-		while (window.isOpen()) {
-			processInput(window);
+		while (GameState::getInstance().Window.isOpen()) {
+			processInput(GameState::getInstance().Window);
 
 			if (selectedOption) {
 				selectedOption = false;
 				return chosenScreen;
 			}
 
-			render(window);
+			render(GameState::getInstance().Window);
 		}
 
 		return ScreensEnum::None;
