@@ -82,6 +82,8 @@ public:
 		for (int i = 0; i < GameState::getInstance().HighScoreTable.HighScores.size(); ++i)
 			renderHighScore(window, i + 1, GameState::getInstance().HighScoreTable.HighScores[i]);
 
+		Screen::render(window);
+
 		window.display();
 	}
 };

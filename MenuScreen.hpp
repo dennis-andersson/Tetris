@@ -100,6 +100,9 @@ public:
 				case sf::Keyboard::S:
 					screenshot(window, "screenshot.png");
 					break;
+				default:
+					Screen::processInput(event);
+					break;
 				}
 				break;
 			case sf::Event::MouseMoved:
@@ -230,15 +233,21 @@ public:
 		if (false)
 			drawBoundingBoxes(window);
 
+		Screen::render(window);
 		window.display();
 	}
 
 	ScreensEnum run()
 	{
+		sf::Clock clock;
+		sf::Time deltaTime{ sf::Time::Zero };
 		GameState::getInstance().Sound.playMenuMusic();
 
 		while (GameState::getInstance().Window.isOpen()) {
 			processInput(GameState::getInstance().Window);
+
+			deltaTime = clock.restart();
+			update(deltaTime);
 
 			if (selectedOption) {
 				selectedOption = false;

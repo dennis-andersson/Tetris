@@ -57,6 +57,7 @@ public:
 		window.clear();
 		header.draw(window);
 		drawBackground(window);
+		Screen::render(window);
 		window.display();
 	}
 

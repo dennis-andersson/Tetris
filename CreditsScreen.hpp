@@ -61,6 +61,9 @@ public:
 			text[i].draw(window);
 		}
 		Credits.draw(window);
+
+		Screen::render(window);
+
 		window.display();
 	}
 };

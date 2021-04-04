@@ -219,6 +219,8 @@ public:
 		// Draw text
 		drawTextElements(window);
 
+		Screen::render(window);
+
 		window.display();
 	}
 
@@ -309,6 +311,8 @@ public:
 				return;
 			newShapes();
 		}
+
+		Screen::update(deltaTime);
 	}
 
 	void moveShape(Direction direction)
@@ -414,6 +418,9 @@ public:
 						// DEBUG
 						currentScore.addSoftScore(1200);
 						currentLevel.nextLevel(currentScore.score);
+						break;
+					default:
+						Screen::processInput(event);
 						break;
 					}
 					break;

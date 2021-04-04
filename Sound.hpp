@@ -118,6 +118,18 @@ public:
 		backgroundMusic.stop();
 	}
 
+	void setVolume(float volume)
+	{
+		backgroundMusic.setVolume(volume);
+		menuMusic.setVolume(volume);
+		sound.setVolume(volume);
+	}
+
+	float getVolume()
+	{
+		return sound.getVolume();
+	}
+
 	/*void nextLevelReached()
 	{
 
