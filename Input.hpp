@@ -1,6 +1,37 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include "Direction.hpp"
+
+enum class InputSource
+{
+	None, Keyboard, Joystick
+};
+
+enum class InputType
+{
+	Stick, Dpad
+};
+
+struct Movement
+{
+	Direction direction;
+	InputSource source;
+	InputType type;
+	sf::Keyboard::Key key;
+	sf::Joystick::Axis axis;
+
+	Movement()
+	{
+		reset();
+	}
+
+	void reset()
+	{
+		direction = Direction::Down;
+		source = InputSource::None;
+	}
+};
 
 enum class GamepadButtons
 {

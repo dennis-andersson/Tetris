@@ -7,6 +7,7 @@
 #include "Input.hpp"
 #include "GameState.hpp"
 #include "TextElement.hpp"
+#include "Utils.hpp"
 
 class Screen
 {

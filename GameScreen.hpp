@@ -2,6 +2,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
+#include <unordered_map>
 #include <array>
 #include <vector>
 #include <stack>
@@ -56,7 +57,7 @@ private:
 	sf::Texture blockTextures;
 	std::vector<sf::Sprite> blocks;
 
-	Direction direction;
+	//Direction direction;
 	bool rotateShape{ false };
 	float dpadX, dpadY;
 	float limit{ 15.f };
@@ -81,6 +82,20 @@ private:
 	bool counterClockwise;
 
 	std::default_random_engine engine{ static_cast<unsigned int>(std::chrono::system_clock::now().time_since_epoch().count()) };
+
+	Movement movement;
+
+	std::unordered_map<sf::Keyboard::Key, Direction> table{
+		{sf::Keyboard::Left, Direction::Left},
+		{sf::Keyboard::Right, Direction::Right},
+		{sf::Keyboard::Down, Direction::SoftDown}
+//		,{sf::Keyboard::Up, Direction::Up}
+	};
+
+	std::unordered_map<sf::Event::EventType, InputSource> eventTypes{
+		{sf::Event::KeyPressed, InputSource::Keyboard},
+		{sf::Event::KeyReleased, InputSource::Keyboard},
+		{sf::Event::JoystickMoved, InputSource::Joystick} };
 
 	int getRandomShapeId()
 	{
@@ -239,6 +254,7 @@ public:
 			sf::Time trigger{ currentLevel.getLevelSpeed() };
 			deltaTime = clock.restart();
 			elapsedTime += deltaTime;
+			sf::Time foo = sf::milliseconds(16);
 
 			switch (mode.top()) {
 			case GameMode::Running:
@@ -256,12 +272,19 @@ public:
 				render(window);
 				break;
 			case GameMode::RemovingLines:
-				processEvents(window);
-				if (endGame) return;
-				update(deltaTime);
-				render(window);
-				if (!grid.aboutToRemoveLines())
-					mode.pop();
+				if (elapsedTime > foo) {
+					elapsedTime = sf::Time::Zero;
+
+					if (endGame) return;
+					processEvents(window);
+
+					update(deltaTime);
+					render(window);
+					if (!grid.aboutToRemoveLines()) {
+						mode.pop();
+						movement.reset();
+					}
+				}
 				break;
 			case GameMode::Paused:
 				processEvents(window);
@@ -298,8 +321,13 @@ public:
 
 	void update(const sf::Time& deltaTime)
 	{
-		if (direction != Direction::None)
-			moveShape(direction);
+		Screen::update(deltaTime);
+
+		if (mode.top() == GameMode::Paused)
+			return;
+
+		if (mode.top() != GameMode::RemovingLines && movement.direction != Direction::Down)
+			moveShape(movement.direction);
 
 		if (rotateShape)
 			rotate(counterClockwise);
@@ -311,8 +339,6 @@ public:
 				return;
 			newShapes();
 		}
-
-		Screen::update(deltaTime);
 	}
 
 	void moveShape(Direction direction)
@@ -320,7 +346,7 @@ public:
 		if (canMove(currentShape.getFutureBlockPositions(direction))) {
 			currentShape.move(direction);
 		} else {
-			if (direction == Direction::Down || direction == Direction::SoftDown) {
+			if (movement.direction == Direction::Down || movement.direction == Direction::SoftDown) {
 				int id = currentShape.getId();
 				grid.addBlock(id, currentShape.getBlockPositions());
 				currentShape.toggleVisible();
@@ -332,8 +358,11 @@ public:
 					GameState::getInstance().Sound.playSoundEffect(rowsToRemove == 4 ? SoundEffect::Tetris : SoundEffect::LinesCleared);
 					currentScore.addPoints(rowsToRemove, currentLevel.getLevel());
 					linesCleared += rowsToRemove;
+					if (mode.top() == GameMode::RemovingLines)
+						X++;
 					mode.push(GameMode::RemovingLines);
-				} else {
+				}
+				else {
 					GameState::getInstance().Sound.playSoundEffect(SoundEffect::SoftDrop);
 					newShapes();
 					if (!canMove(currentShape.getBlockPositions()))
@@ -341,6 +370,8 @@ public:
 				}
 
 				currentLevel.nextLevel(currentScore.score);
+			} else {
+				movement.reset();
 			}
 		}
 	}
@@ -375,13 +406,32 @@ public:
 
 	void processEvents(sf::RenderWindow& window)
 	{
+		GamepadButtons button;
 		sf::Event event;
+		float position;
+
+		if (sf::Joystick::isConnected(0) && mode.top() == GameMode::Running) {
+			X = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::X);
+			Y = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Y);
+
+			if (movement.source == InputSource::Joystick && movement.type == InputType::Stick && abs(X) < limit && abs(Y) < limit)
+				movement.reset();
+
+			if (movement.direction == Direction::Down && abs(X) > limit || abs(Y) > limit) {
+				if (abs(X) > abs(Y))
+					movement.direction = X > 0.f ? Direction::Right : Direction::Left;
+				else
+					if (Y > 0.f)
+						movement.direction = Direction::Down;
+
+				movement.type = InputType::Stick;
+				movement.source = InputSource::Joystick;
+			}
+		}
 
 		rotateShape = false;
-		direction = Direction::None;
+		//direction = Direction::None;
 		while (window.pollEvent(event)) {
-			GamepadButtons button;
-			
 			if (event.type == sf::Event::Closed) {
 				window.close();
 				return;
@@ -392,37 +442,53 @@ public:
 
 			switch (mode.top()) {
 			case GameMode::Running:
+				if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::R) {
+					movement.reset();
+					continue;
+				}
+
+				if (movement.source != InputSource::None && eventTypes.contains(event.type) && eventTypes[event.type] != movement.source)
+					continue;
+
 				switch (event.type) {
 				case sf::Event::KeyPressed:
-					switch (event.key.code) {
-					case sf::Keyboard::Left:
-						direction = Direction::Left;
-						break;
-					case sf::Keyboard::Right:
-						direction = Direction::Right;
-						break;
-					case sf::Keyboard::Down:
-						direction = Direction::SoftDown;
-						break;
-					case sf::Keyboard::Up:
-						rotateShape = true;
-						counterClockwise = event.key.control;
-						break;
-					case sf::Keyboard::Escape:
-						endGame = true;
-						break;
-					case sf::Keyboard::P:
-						pauseGame();
-						break;
-					case sf::Keyboard::A:
-						// DEBUG
-						currentScore.addSoftScore(1200);
-						currentLevel.nextLevel(currentScore.score);
-						break;
-					default:
-						Screen::processInput(event);
-						break;
+					if (table.contains(event.key.code)) {
+						if (movement.direction != Direction::Down)
+							break;
+
+						movement.source = InputSource::Keyboard;
+						movement.direction = table[event.key.code];
+						movement.key = event.key.code;
+					}else{
+						switch (event.key.code) {
+						case sf::Keyboard::Up:
+							rotateShape = true;
+							counterClockwise = event.key.control;
+							break;
+						case sf::Keyboard::Escape:
+							endGame = true;
+							break;
+						case sf::Keyboard::P:
+							pauseGame();
+							break;
+						case sf::Keyboard::A:
+							// DEBUG
+							currentScore.addSoftScore(1200);
+							currentLevel.nextLevel(currentScore.score);
+							break;
+						default:
+							Screen::processInput(event);
+							break;
+						}
 					}
+					break;
+				case sf::Event::KeyReleased:
+					if (movement.direction == Direction::Down)
+						break;
+
+					if (movement.key == event.key.code)
+						movement.reset();
+
 					break;
 				case sf::Event::JoystickButtonPressed:
 					switch (button) {
@@ -437,24 +503,46 @@ public:
 						rotateShape = true;
 						counterClockwise = (button == GamepadButtons::X || button == GamepadButtons::Y);
 						break;
+					case GamepadButtons::RightShoulder:
+						rotateShape = rotateShape;
+						break;
 					}
 					break;
 				case sf::Event::JoystickMoved:
-					X = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::X);
-					Y = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::Y);
+					position = event.joystickMove.position;
 
-					dpadX = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::PovX);
-					dpadY = sf::Joystick::getAxisPosition(0, sf::Joystick::Axis::PovY);
+					if (movement.type == InputType::Dpad && (position < 0.5f && position > -0.5f)) {
+						movement.reset();
+						break;
+					}
 
-					if (dpadX > 0.5f)	direction = Direction::Right;
-					if (dpadX < -0.5f)	direction = Direction::Left;
-					if (dpadY < -0.5f)	direction = Direction::SoftDown;
-					if (dpadY > 0.5f)	rotateShape = true;
+					if (movement.source == InputSource::Keyboard)
+						break;
 
-					if (X > limit)	direction = Direction::Right;
-					if (X < -limit)	direction = Direction::Left;
-					if (Y > limit)	direction = Direction::SoftDown;
-					//if (Y < -limit)	rotateShape = true;
+					if (movement.source == InputSource::Joystick && event.joystickMove.axis != movement.axis)
+						break;
+
+					switch (event.joystickMove.axis) {
+					case sf::Joystick::Axis::PovX:
+						movement.source = InputSource::Joystick;
+						movement.axis = sf::Joystick::Axis::PovX;
+						movement.type = InputType::Dpad;
+						if (position > 0.5f)	movement.direction = Direction::Right;
+						if (position < -0.5f)	movement.direction = Direction::Left;
+						break;
+					case sf::Joystick::Axis::PovY:
+						movement.source = InputSource::Joystick;
+						movement.axis = sf::Joystick::Axis::PovY;
+						movement.type = InputType::Dpad;
+						dpadY = event.joystickMove.position;
+						if (position < 0.5f)	movement.direction = Direction::SoftDown;
+						//if (position > 0.5f)	movement.direction = Direction::Up;
+						break;
+					default:
+						if (event.joystickMove.axis != sf::Joystick::Axis::X && event.joystickMove.axis != sf::Joystick::Axis::Y)
+							break;
+						break;
+					}
 					break;
 				}
 				break;
@@ -509,6 +597,7 @@ public:
 	void resetGame()
 	{
 		mode.push(GameMode::Running);
+		movement.reset();
 		gameOverText.setVisible(false);
 		currentScore.score = 0;
 		currentLevel.reset();
