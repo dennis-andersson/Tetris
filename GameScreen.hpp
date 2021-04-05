@@ -25,7 +25,7 @@
 
 enum class GameMode
 {
-	Running, RemovingLines, Paused, GameOver
+	Running, RemovingLines, Paused, GameOver, AddHighScore
 };
 
 class GameScreen : public Screen
@@ -80,6 +80,11 @@ private:
 
 	bool endGame{ false };
 	bool counterClockwise;
+
+	sf::RectangleShape addHighscoreBox;
+	TextElement addHighscoreMessage;
+	TextElement nameText;
+	std::string name;
 
 	std::default_random_engine engine{ static_cast<unsigned int>(std::chrono::system_clock::now().time_since_epoch().count()) };
 
@@ -198,6 +203,18 @@ public:
 		currentShape.setOffset(borderPosition);
 		newShape(currentShape, shapeFirstPosition);
 		newShape(nextShape, nextShapePosition);
+
+		// Add High score stuff
+		addHighscoreBox.setSize(sf::Vector2f(361,300));
+		addHighscoreBox.setPosition(sf::Vector2f(50, 100));
+		addHighscoreBox.setFillColor(sf::Color::Black);
+		addHighscoreBox.setOutlineColor(sf::Color::Red);
+		addHighscoreBox.setOutlineThickness(4.f);
+		sf::Vector2f addHighscoreMessagePosition{ 80, 130 };
+		sf::Vector2f nameTextPosition{ 125, 215 };
+		addHighscoreMessage.init("You've got a high score!\nPlease enter your name", addHighscoreMessagePosition, 25, textColor2, textStyle);
+		nameText.init(nameTextPosition, 25, textColor2, textStyle);
+		sf::FloatRect box{ addHighscoreMessage.getBoundingBox() };
 	}
 
 	sf::Sprite& getBlock(int blockId)
@@ -233,6 +250,12 @@ public:
 
 		// Draw text
 		drawTextElements(window);
+
+		if (mode.top() == GameMode::AddHighScore) {
+			window.draw(addHighscoreBox);
+			addHighscoreMessage.draw(window);
+			nameText.draw(window, name);
+		}
 
 		Screen::render(window);
 
@@ -287,38 +310,16 @@ public:
 				}
 				break;
 			case GameMode::Paused:
+			case GameMode::GameOver:
+			case GameMode::AddHighScore:
 				processEvents(window);
 				if (endGame) return;
 				update(deltaTime);
 				render(window);
 				break;
-			case GameMode::GameOver:
-				sf::Event event;
-
-				while (window.pollEvent(event)) {
-					if (event.type == sf::Event::Closed)
-						window.close();
-
-					if (event.type == sf::Event::JoystickButtonPressed) {
-						mode.pop();
-						return;
-					}
-
-					if (event.type == sf::Event::KeyPressed) {
-						if (event.key.code == sf::Keyboard::Escape)
-							endGame = true;
-						else
-							mode.pop();
-						return;
-					}
-				}
-
-				render(window);
-				break;
 			}
 		}
 	}
-
 
 	void update(const sf::Time& deltaTime)
 	{
@@ -326,6 +327,10 @@ public:
 
 		if (mode.top() == GameMode::Paused)
 			return;
+
+		if (mode.top() == GameMode::AddHighScore) {
+			return;
+		}
 
 		movement.update(deltaTime.asSeconds());
 
@@ -387,6 +392,10 @@ public:
 		mode.push(GameMode::GameOver);
 		gameOverText.setVisible(true);
 		makeRoomForText();
+
+		if (GameState::getInstance().HighScoreTable.isScoreHighEnough(currentScore.score)) {
+			mode.push(GameMode::AddHighScore);
+		}
 	}
 
 	void makeRoomForText()
@@ -566,8 +575,51 @@ public:
 					break;
 				}
 				break;
+			case GameMode::GameOver:
+				if (event.type == sf::Event::JoystickButtonPressed) {
+					mode.pop();
+					return;
+				}
+
+				if (event.type == sf::Event::KeyPressed) {
+					if (event.key.code == sf::Keyboard::Escape)
+						endGame = true;
+					else
+						mode.pop();
+					return;
+				}
+				break;
+			case GameMode::AddHighScore:
+				if (event.type == sf::Event::KeyPressed) {
+					sf::Keyboard::Key key = event.key.code;
+
+					if (isLetter(key)) {
+						char ch{ 'a' };
+						ch += key;
+
+						if (event.key.shift)
+							ch = std::toupper(ch);
+
+						name += ch;
+					} else if (key == sf::Keyboard::Backspace) {
+						name.resize(name.size() - 1);
+					} else if (key == sf::Keyboard::Enter) {
+						if (name.size() > 0) {
+							GameState::getInstance().HighScoreTable.addHighScore(name, currentScore.score);
+							mode.pop();
+						}
+					} else if (key == sf::Keyboard::Escape) {
+						mode.pop();
+					}
+				}
+				break;
 			}
 		}
+	}
+
+	bool isLetter(sf::Keyboard::Key key)
+	{
+		return (key >= sf::Keyboard::A && key <= sf::Keyboard::Z);
 	}
 
 	void rotate(bool ccw = true)
@@ -602,6 +654,7 @@ public:
 
 	void resetGame()
 	{
+		name = "";
 		mode.push(GameMode::Running);
 		movement.reset();
 		gameOverText.setVisible(false);
