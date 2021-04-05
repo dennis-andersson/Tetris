@@ -23,8 +23,8 @@
 #include "GameScreen.hpp"
 #include "HighScoreTableScreen.hpp"
 #include "CreditsScreen.hpp"
-#include "AddHighScoreScreen.hpp"
 #include "GameState.hpp"
+#include "ControllerMapScreen.hpp"
 
 class Game
 {
@@ -60,7 +60,6 @@ public:
 		GameState::getInstance().Window.create(sf::VideoMode(GameState::getInstance().WindowWidth, GameState::getInstance().WindowHeight), windowTitle);
 		GameState::getInstance().Window.setFramerateLimit(60);
 		GameState::getInstance().Window.setIcon(titleBarIcon.getSize().x, titleBarIcon.getSize().y, titleBarIcon.getPixelsPtr());
-		GameState::getInstance().Window.setKeyRepeatEnabled(false);
 		GameState::getInstance().HighScoreTable.readHighScores();
 		GameState::getInstance().Sound.loadSoundEffects();
 		setVolumeLevel();
@@ -69,7 +68,7 @@ public:
 		GameScreen game;
 		CreditsScreen credits;
 		HighScoreTableScreen highScoreTable;
-		AddHighScoreScreen addHighScoreScreen;
+		ControllerMapScreen ControlsScreen;
 
 		ScreensEnum currentScreen = ScreensEnum::Menu;
 
@@ -86,6 +85,7 @@ public:
 				currentScreen = highScoreTable.run();
 				break;
 			case ScreensEnum::Controls:
+				currentScreen = ControlsScreen.run();
 				break;
 			case ScreensEnum::Credits:
 				currentScreen = credits.run();
