@@ -94,7 +94,6 @@ private:
 		{sf::Keyboard::Left, Direction::Left},
 		{sf::Keyboard::Right, Direction::Right},
 		{sf::Keyboard::Down, Direction::SoftDown}
-//		,{sf::Keyboard::Up, Direction::Up}
 	};
 
 	std::unordered_map<sf::Event::EventType, InputSource> eventTypes{
@@ -211,7 +210,7 @@ public:
 		addHighscoreBox.setOutlineColor(sf::Color::Red);
 		addHighscoreBox.setOutlineThickness(4.f);
 		sf::Vector2f addHighscoreMessagePosition{ 80, 130 };
-		sf::Vector2f nameTextPosition{ 125, 215 };
+		sf::Vector2f nameTextPosition{ 105, 215 };
 		addHighscoreMessage.init("You've got a high score!\nPlease enter your name", addHighscoreMessagePosition, 25, textColor2, textStyle);
 		nameText.init(nameTextPosition, 25, textColor2, textStyle);
 		sf::FloatRect box{ addHighscoreMessage.getBoundingBox() };
@@ -550,7 +549,6 @@ public:
 						movement.type = InputType::Dpad;
 						dpadY = event.joystickMove.position;
 						if (position < 0.5f)	movement.direction = Direction::SoftDown;
-						//if (position > 0.5f)	movement.direction = Direction::Up;
 						break;
 					default:
 						if (event.joystickMove.axis != sf::Joystick::Axis::X && event.joystickMove.axis != sf::Joystick::Axis::Y)
@@ -592,15 +590,22 @@ public:
 			case GameMode::AddHighScore:
 				if (event.type == sf::Event::KeyPressed) {
 					sf::Keyboard::Key key = event.key.code;
+					char ch;
+					const int nameLimit{ 21 };
 
 					if (isLetter(key)) {
-						char ch{ 'a' };
-						ch += key;
-
+						ch = 'a' + key;
 						if (event.key.shift)
 							ch = std::toupper(ch);
-
-						name += ch;
+						if (name.size() < nameLimit)
+							name += ch;
+					} else if (isDigit(key)) {
+						ch = '0' + (key - sf::Keyboard::Num0);
+						if (name.size() < nameLimit)
+							name += ch;
+					} else if (key == sf::Keyboard::Space) {
+						if (name.size() < nameLimit)
+							name += ' ';
 					} else if (key == sf::Keyboard::Backspace) {
 						name.resize(name.size() - 1);
 					} else if (key == sf::Keyboard::Enter) {
@@ -615,6 +620,11 @@ public:
 				break;
 			}
 		}
+	}
+
+	bool isDigit(sf::Keyboard::Key key)
+	{
+		return (key >= sf::Keyboard::Num0 && key <= sf::Keyboard::Num9);
 	}
 
 	bool isLetter(sf::Keyboard::Key key)
