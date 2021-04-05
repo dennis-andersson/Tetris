@@ -93,25 +93,5 @@ public:
 
 		window.display();
 	}
-
-	//ScreensEnum run()
-	//{
-	//	sf::Clock clock;
-	//	sf::Time deltaTime{ sf::Time::Zero };
-
-	//	while (GameState::getInstance().Window.isOpen()) {
-	//		processInput(GameState::getInstance().Window);
-
-	//		if (goBack())
-	//			return ScreensEnum::Menu;
-
-	//		deltaTime = clock.restart();
-	//		update(deltaTime);
-
-	//		render(GameState::getInstance().Window);
-	//	}
-
-	//	return ScreensEnum::Menu;
-	//}
 };
 
