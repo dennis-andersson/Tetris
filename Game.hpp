@@ -7,6 +7,7 @@
 #include <stack>
 #include <random>
 #include <chrono>
+#include <fstream>
 #include "MenuScreen.hpp"
 #include "Tetromino.hpp"
 #include "HighScoreTable.hpp"
@@ -23,60 +24,80 @@
 #include "HighScoreTableScreen.hpp"
 #include "CreditsScreen.hpp"
 #include "AddHighScoreScreen.hpp"
+#include "GameState.hpp"
 
 class Game
 {
 private:
-	sf::RenderWindow window;
 	const std::string windowTitle{ "Tetris" };
 	const int WindowWidth{ 500 };
 	const int WindowHeight{ 580 };
-	HighScoreTable highScores;
 	sf::Image titleBarIcon;
+	std::string volumeDataFile{ "volume.dat" };
 
+	void setVolumeLevel()
+	{
+		std::ifstream file;
+		float volume;
+
+		file.open(volumeDataFile);
+		file >> volume;
+		file.close();
+
+		GameState::getInstance().Sound.setVolume(volume);
+	}
+
+	void saveVolumeLevel()
+	{
+		std::ofstream file;
+
+		file.open(volumeDataFile);
+		file << GameState::getInstance().Sound.getVolume();
+		file.close();
+	}
 public:
 	void Run()
 	{
-		window.create(sf::VideoMode(WindowWidth, WindowHeight), windowTitle);
-		window.setFramerateLimit(60);
-
 		titleBarIcon.loadFromFile("Icons/tetris.png");
-		window.setIcon(titleBarIcon.getSize().x, titleBarIcon.getSize().y, titleBarIcon.getPixelsPtr());
+		GameState::getInstance().Window.create(sf::VideoMode(WindowWidth, WindowHeight), windowTitle);
+		GameState::getInstance().Window.setFramerateLimit(60);
+		GameState::getInstance().Window.setIcon(titleBarIcon.getSize().x, titleBarIcon.getSize().y, titleBarIcon.getPixelsPtr());
+		GameState::getInstance().Window.setKeyRepeatEnabled(false);
+		GameState::getInstance().HighScoreTable.readHighScores();
+		GameState::getInstance().Sound.loadSoundEffects();
+		setVolumeLevel();
 
-		highScores.readHighScores();
-
-		Sound::GetInstance().loadSoundEffects();
-
-		MenuScreen menu(window);
-		GameScreen game(window);
-		LevelSelectionScreen levelSelection(window);
-		CreditsScreen credits(window);
-		HighScoreTableScreen highScoreTable(window, highScores);
-		AddHighScoreScreen addHighScoreScreen(window, highScores);
+		MenuScreen menu;
+		GameScreen game;
+		LevelSelectionScreen levelSelection;
+		CreditsScreen credits;
+		HighScoreTableScreen highScoreTable;
+		AddHighScoreScreen addHighScoreScreen;
 
 		ScreensEnum currentScreen = ScreensEnum::Menu;
 
 		while (currentScreen != ScreensEnum::None) {
 			switch (currentScreen) {
 			case ScreensEnum::Menu:
-				currentScreen = menu.run(window);
+				currentScreen = menu.run();
 				break;
 			case ScreensEnum::Play:
-				currentScreen = game.run(window);
+				currentScreen = game.run();
 				break;
 			case ScreensEnum::LevelSelection:
-				currentScreen = levelSelection.run(window);
+				currentScreen = levelSelection.run();
 				break;
 			case ScreensEnum::HighScores:
-				currentScreen = highScoreTable.run(window);
+				currentScreen = highScoreTable.run();
 				break;
 			case ScreensEnum::Credits:
-				currentScreen = credits.run(window);
+				currentScreen = credits.run();
 				break;
 			}
 		}
 
-		highScores.saveHighScores();
+		saveVolumeLevel();
+		GameState::getInstance().HighScoreTable.saveHighScores();
 	}
 };
 

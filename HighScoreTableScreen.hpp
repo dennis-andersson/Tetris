@@ -10,7 +10,6 @@
 class HighScoreTableScreen : public Screen
 {
 private:
-	HighScoreTable highScores;
 	const int headerSize{ 42 };
 	const int textSize{ 26 };
 	const int skip{ textSize + 9 };
@@ -28,10 +27,10 @@ private:
 	const sf::Uint8 headerStyle{ sf::Text::Style::Bold };
 	const sf::Uint8 textStyle{ sf::Text::Style::Regular };
 public:
-	HighScoreTableScreen(sf::RenderWindow& window, HighScoreTable& HighScores) : highScores(HighScores), Screen(window)
+	HighScoreTableScreen()
 	{
 		// Add whatever needs to be setup here.
-		const sf::Vector2u windowSize = window.getSize();
+		const sf::Vector2u windowSize = GameState::getInstance().Window.getSize();
 		const int Width = windowSize.x;
 		const int Height = windowSize.y;
 
@@ -80,8 +79,10 @@ public:
 		name.draw(window);
 		score.draw(window);
 
-		for (int i = 0; i < highScores.HighScores.size(); ++i)
-			renderHighScore(window, i + 1, highScores.HighScores[i]);
+		for (int i = 0; i < GameState::getInstance().HighScoreTable.HighScores.size(); ++i)
+			renderHighScore(window, i + 1, GameState::getInstance().HighScoreTable.HighScores[i]);
+
+		Screen::render(window);
 
 		window.display();
 	}

@@ -1,23 +1,40 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include <string>
 #include "Background.hpp"
 #include "ScreensEnum.hpp"
 #include "Input.hpp"
+#include "GameState.hpp"
+#include "TextElement.hpp"
+#include "Utils.hpp"
 
 class Screen
 {
 private:
 	bool goBack{ false };
 
-	static inline Background background;
 	static inline sf::Texture backButtonTexture;
 	static inline sf::Sprite goBackButton;
 	static inline const sf::Vector2f backButtonPosition{25, 510};
 	static inline sf::FloatRect backButtonBoundingBox;
-public:
+	static inline TextElement volumeText;
+	const float volumeTimerLimit{ 0.7f };
+	sf::Time volumeTimer;
 
-	Screen(sf::RenderWindow& window)
+	void newVolume(float newVolume)
+	{
+		GameState::getInstance().Sound.setVolume(newVolume);
+		volumeTimer = sf::Time::Zero;
+		showVolume();
+	}
+
+	void showVolume()
+	{
+		volumeText.setVisible(true);
+	}
+public:
+	Screen()
 	{
 		if (backButtonTexture.getSize().x == 0) {
 			backButtonTexture.loadFromFile("Images/back-button.png");
@@ -27,17 +44,15 @@ public:
 			backButtonBoundingBox.top    = backButtonPosition.y;
 			backButtonBoundingBox.width  = backButtonTexture.getSize().x;
 			backButtonBoundingBox.height = backButtonTexture.getSize().y;
-		}
 
-		if (!background.isLoaded()) {
-			background.setBackground("Images/background3.jpg");
-			background.setSize(window.getSize().x, window.getSize().y);
+			volumeText.init(sf::Vector2f( GameState::getInstance().WindowWidth - 225, GameState::getInstance().WindowHeight - 80 ), 36, sf::Color::Green, sf::Text::Style::Bold);
+			volumeText.setVisible(false);
 		}
 	}
 
 	void drawBackground(sf::RenderWindow& window)
 	{
-		background.draw(window);
+		GameState::getInstance().Background.draw(window);
 	}
 
 	void drawBackButton(sf::RenderWindow& window)
@@ -62,28 +77,75 @@ public:
 			goBack = pressedEscape || pressedBButton || clickedOnBackButton;
 
 			if (goBack) return;
+
+			processInput(event);
 		}
 	}
 
-	virtual void update(const sf::Time& deltaTime) {};
+	virtual void processInput(sf::Event event)
+	{
+		if (event.type == sf::Event::KeyPressed) {
+			switch (event.key.code) {
+			case sf::Keyboard::Num9:
+				lowerVolume();
+				break;
+			case sf::Keyboard::Num0:
+				raiseVolume();
+				break;
+			case sf::Keyboard::S:
+				screenshot(GameState::getInstance().Window, "screenshot.png");
+				break;
+			}
+		}
+
+	}
+
+	virtual void update(const sf::Time& deltaTime)
+	{
+		if (volumeText.isVisible()) {
+			volumeTimer += deltaTime;
+			if (volumeTimer.asSeconds() > volumeTimerLimit) {
+				volumeText.setVisible(false);
+				volumeTimer = sf::Time::Zero;
+			}
+		}
+	};
 
 	virtual void render(sf::RenderWindow& window)
 	{
-		window.clear();
-		window.display();
+		if (volumeText.isVisible()) {
+			std::string text{ "Volume: " + std::to_string((int) GameState::getInstance().Sound.getVolume()) };
+			volumeText.draw(window, text);
+		}
 	}
 
-	ScreensEnum run(sf::RenderWindow& window)
+	void lowerVolume()
 	{
-		while (window.isOpen()) {
-			processInput(window);
+		newVolume(std::max(GameState::getInstance().Sound.getVolume() - 3, 0.f));
+	}
+
+	void raiseVolume()
+	{
+		newVolume(std::min(GameState::getInstance().Sound.getVolume() + 3, 100.f));
+	}
+
+	ScreensEnum run()
+	{
+		sf::Clock clock;
+		sf::Time deltaTime{ sf::Time::Zero };
+
+		while (GameState::getInstance().Window.isOpen()) {
+			processInput(GameState::getInstance().Window);
 
 			if (goBack) {
 				goBack = false;
 				return ScreensEnum::Menu;
 			}
 
-			render(window);
+			deltaTime = clock.restart();
+			update(deltaTime);
+
+			render(GameState::getInstance().Window);
 		}
 	}
 };

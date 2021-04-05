@@ -1,29 +1,27 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include <string>
 
 class Background
 {
 public:
-	Background() {}
-
-	Background(std::string filename)
+	Background()
 	{
-		setBackground(filename);
 	}
 
-	void setBackground(std::string filename)
+	~Background()
+	{
+
+	}
+
+	void setBackground(std::string filename, int Width, int Height)
 	{
 		if (!texture.loadFromFile(filename))
 			throw std::exception("Couldn't load background image");
 
 		texture.setRepeated(true);
 		sprite.setTexture(texture);
-		loaded = true;
-	}
-
-	void setSize(int Width, int Height)
-	{
 		sprite.setTextureRect(sf::IntRect(0, 0, Width, Height));
 	}
 
@@ -31,15 +29,9 @@ public:
 	{
 		window.draw(sprite);
 	}
-
-	bool isLoaded()
-	{
-		return loaded;
-	}
 private:
 	sf::Texture texture;
 	sf::Sprite sprite;
-	bool loaded{ false };
 };
 
 

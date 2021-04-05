@@ -98,7 +98,7 @@ public:
 		//store state of Block in case rotation turns out to be invalid
 		oldBlock = block;
 
-		if (id == BlockNames::Square) //square: no need for rotation
+		if (id == BlockNames::Square) // square: no need for rotation
 			return;
 
 		if (id == BlockNames::I) { // I: restrict "rotation" to two states (horizontal/vertical)
@@ -130,15 +130,14 @@ public:
 			 * translates to clockwise
 			 * [0   -1]
 			 * [1    0]
+			 *
+			 * Counterclockwise Rotation Matrix
+			 * [cos Degree     sin Degree]
+			 * [-sin Degree    cos Degree]
+			 * translates to counterclockwise
+			 * [0    1]
+			 * [-1   0]
 			 */
-
-			 /* Counterclockwise Rotation Matrix
-			  * [cos Degree     sin Degree]
-			  * [-sin Degree    cos Degree]
-			  * translates to counterclockwise
-			  * [0    1]
-			  * [-1   0]
-			  */
 
 			sf::Vector2i nextPoint;
 			if (counterClockwise) {

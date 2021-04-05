@@ -1,10 +1,10 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include <string>
 #include "Screen.hpp"
 #include "Game.hpp"
 #include "TextElement.hpp"
-#include <string>
 
 class CreditsScreen : public Screen
 {
@@ -17,10 +17,10 @@ private:
 	sf::Color textColor{ sf::Color::White };
 	sf::Uint8 textStyle{ sf::Text::Style::Regular };
 public:
-	CreditsScreen(sf::RenderWindow& window) : Screen(window)
+	CreditsScreen()
 	{
 		// Add whatever needs to be setup here.
-		position.x = window.getSize().x / 2;	// Center of the window
+		position.x = GameState::getInstance().WindowWidth / 2;	// Center of the window
 		//position.y = 200;
 
 		position.y = 100;
@@ -61,6 +61,9 @@ public:
 			text[i].draw(window);
 		}
 		Credits.draw(window);
+
+		Screen::render(window);
+
 		window.display();
 	}
 };

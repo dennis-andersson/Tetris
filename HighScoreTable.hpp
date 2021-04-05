@@ -7,7 +7,13 @@
 struct HighScore
 {
 	std::string Name;
-	int Score;
+	int Score{ 0 };
+
+	HighScore()
+	{
+		Name = "";
+		Score = 0;
+	}
 
 	HighScore(std::string name, int score) : Name(name), Score(score) {}
 };

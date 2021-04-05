@@ -1,6 +1,6 @@
 #pragma once
 
-enum ScreensEnum
+enum class ScreensEnum
 {
 	Menu, LevelSelection, Play, HighScores, AddHighScore, Credits, None
 };

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include "GameState.hpp"
 #include "HighScoreTable.hpp"
 #include "Screen.hpp"
 #include "TextElement.hpp"
@@ -8,7 +9,6 @@
 class AddHighScoreScreen : public Screen
 {
 private:
-	HighScoreTable highScores;
 	TextElement header;
 	std::string headerText{ "Please enter your name" };
 	sf::Vector2f headerPosition {59, 141};
@@ -16,7 +16,7 @@ private:
 	sf::Uint8 textStyle{ sf::Text::Style::Regular };
 	int textSize{ 36 };
 public:
-	AddHighScoreScreen(sf::RenderWindow& window, HighScoreTable& HighScores) : Screen(window), highScores(HighScores)
+	AddHighScoreScreen()
 	{
 		header.init(headerText, headerPosition, textSize, textColor, textStyle);
 	}
@@ -57,17 +57,18 @@ public:
 		window.clear();
 		header.draw(window);
 		drawBackground(window);
+		Screen::render(window);
 		window.display();
 	}
 
-	ScreensEnum run(sf::RenderWindow& window)
+	ScreensEnum run()
 	{
 		sf::Clock clock;
 
-		while (window.isOpen()) {
-			processInput(window);
+		while (GameState::getInstance().Window.isOpen()) {
+			processInput(GameState::getInstance().Window);
 			update(clock.restart());
-			render(window);
+			render(GameState::getInstance().Window);
 		}
 
 		return ScreensEnum::HighScores;
