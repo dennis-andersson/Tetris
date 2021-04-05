@@ -12,7 +12,7 @@
 class Screen
 {
 private:
-	bool goBack{ false };
+	bool goBackToMainMenu{ false };
 
 	static inline sf::Texture backButtonTexture;
 	static inline sf::Sprite goBackButton;
@@ -65,27 +65,30 @@ public:
 		return backButtonBoundingBox.contains(x, y);
 	}
 
+	bool goBack()
+	{
+		return goBackToMainMenu;
+	}
+
 	virtual void processInput(sf::RenderWindow& window)
 	{
 		sf::Event event;
 
-		while (window.pollEvent(event)) {
-			bool pressedEscape = (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape);
-			bool pressedBButton = (event.type == sf::Event::JoystickButtonPressed && (gamepadButton(event.joystickButton.button) == GamepadButtons::B));
-			bool clickedOnBackButton = (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left && clickOnBackButton(event.mouseButton.x, event.mouseButton.y));
-
-			goBack = pressedEscape || pressedBButton || clickedOnBackButton;
-
-			if (goBack) return;
-
+		while (window.pollEvent(event))
 			processInput(event);
-		}
 	}
 
 	virtual void processInput(sf::Event event)
 	{
+		bool pressedEscape{ false };
+		bool pressedBButton{ false };
+		bool clickedOnBackButton{ false };
+
 		if (event.type == sf::Event::KeyPressed) {
 			switch (event.key.code) {
+			case sf::Keyboard::Escape:
+				pressedEscape = true;
+				break;
 			case sf::Keyboard::Num9:
 				lowerVolume();
 				break;
@@ -96,8 +99,14 @@ public:
 				screenshot(GameState::getInstance().Window, "screenshot.png");
 				break;
 			}
+		} else if (event.type == sf::Event::JoystickButtonPressed) {
+			if (gamepadButton(event.joystickButton.button) == GamepadButtons::B)
+				pressedBButton = true;
+		} else if (event.type == sf::Event::MouseButtonPressed) {
+			clickedOnBackButton = (event.mouseButton.button == sf::Mouse::Left && clickOnBackButton(event.mouseButton.x, event.mouseButton.y));
 		}
 
+		goBackToMainMenu = pressedEscape || pressedBButton || clickedOnBackButton;
 	}
 
 	virtual void update(const sf::Time& deltaTime)
@@ -137,8 +146,8 @@ public:
 		while (GameState::getInstance().Window.isOpen()) {
 			processInput(GameState::getInstance().Window);
 
-			if (goBack) {
-				goBack = false;
+			if (goBackToMainMenu) {
+				goBackToMainMenu = false;
 				return ScreensEnum::Menu;
 			}
 

@@ -22,8 +22,8 @@ private:
 	TextElement Pause;
 	TextElement Lvl;
 	sf::Vector2f position;
-	int textSize{ 40 };
-	int textSize1{ 25 };
+	int textSize{ 35 };
+	int textSize1{ 23 };
 	sf::Color textColor{ sf::Color::White };
 	sf::Uint8 textStyle{ sf::Text::Style::Bold };
 	sf::Uint8 textStyle1{ sf::Text::Style::Regular };
@@ -33,8 +33,8 @@ public:
 	ControllerMapScreen()
 	{
 		position.x = GameState::getInstance().WindowWidth / 2;
-		position.y = 100;
-		ControllerMap.init("Controller Map", position, textSize, textColor, textStyle);
+		position.y = 120;
+		ControllerMap.init("Keyboard controls", position, textSize, textColor, textStyle);
 		ControllerMap.setOriginToCenter();
 
 		position.x = 30;
@@ -81,12 +81,6 @@ public:
 
 	void render(sf::RenderWindow& window)
 	{
-		window.clear();
-
-		// Draw stuff here.
-		drawBackground(window);
-		drawBackButton(window);
-
 		ControllerMap.draw(window);
 		Up.draw(window);
 		CtrlUp.draw(window);
@@ -99,10 +93,6 @@ public:
 
 		for (Image image : images)
 			image.draw(window);
-
-		Screen::render(window);
-
-		window.display();
 	}
 };
 

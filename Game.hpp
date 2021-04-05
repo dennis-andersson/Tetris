@@ -24,7 +24,7 @@
 #include "HighScoreTableScreen.hpp"
 #include "CreditsScreen.hpp"
 #include "GameState.hpp"
-#include "ControllerMapScreen.hpp"
+#include "ControlsScreen.hpp"
 
 class Game
 {
@@ -68,7 +68,7 @@ public:
 		GameScreen game;
 		CreditsScreen credits;
 		HighScoreTableScreen highScoreTable;
-		ControllerMapScreen ControlsScreen;
+		ControlsScreen controlsScreen;
 
 		ScreensEnum currentScreen = ScreensEnum::Menu;
 
@@ -85,7 +85,7 @@ public:
 				currentScreen = highScoreTable.run();
 				break;
 			case ScreensEnum::Controls:
-				currentScreen = ControlsScreen.run();
+				currentScreen = controlsScreen.run();
 				break;
 			case ScreensEnum::Credits:
 				currentScreen = credits.run();

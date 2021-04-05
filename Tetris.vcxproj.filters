@@ -92,6 +92,12 @@
     <ClInclude Include="Image.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ControlsJoypad.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ControlsScreen.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Tetris.rc">

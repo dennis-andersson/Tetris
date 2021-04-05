@@ -169,6 +169,8 @@
     <ClInclude Include="Background.hpp" />
     <ClInclude Include="Border.hpp" />
     <ClInclude Include="ControllerMapScreen.hpp" />
+    <ClInclude Include="ControlsJoypad.hpp" />
+    <ClInclude Include="ControlsScreen.hpp" />
     <ClInclude Include="CreditsScreen.hpp" />
     <ClInclude Include="Direction.hpp" />
     <ClInclude Include="Game.hpp" />

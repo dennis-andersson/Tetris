@@ -47,12 +47,11 @@ public:
 		sprite.setPosition(newPosition);
 	}
 
-	void setSize(sf::Vector2u newSize)
+	sf::Vector2u getSize()
 	{
-		if (!loaded) return;
+		if (!loaded) return sf::Vector2u(0, 0);
 
-		auto scale = sprite.getScale();
-
+		return texture.getSize();
 	}
 
 	void setScale(float newScale)
