@@ -52,6 +52,16 @@ public:
 		// Anything that needs to be cleaned up.
 	}
 
+	void processInput(sf::RenderWindow& window)
+	{
+		sf::Event event;
+
+		while (window.pollEvent(event)) {
+			Screen::processInput(event);
+			if (goBack()) return;
+		}
+	}
+
 	void renderHighScore(sf::RenderWindow& window, const int n, HighScore& highScore)
 	{
 		TextElement entryNumber(std::to_string(n), sf::Vector2f(numberPosition.x, numberPosition.y + (n * skip)), textSize, textColor, textStyle);

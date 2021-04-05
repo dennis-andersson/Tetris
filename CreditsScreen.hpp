@@ -45,6 +45,16 @@ public:
 		// Anything that needs to be cleaned up.
 	}
 
+	void processInput(sf::RenderWindow& window)
+	{
+		sf::Event event;
+
+		while (window.pollEvent(event)) {
+			Screen::processInput(event);
+			if (goBack()) return;
+		}
+	}
+
 	// This is the method that draws everything. Have a look at the other files or online to see
 	// how it's normally implemented.
 	void render(sf::RenderWindow& window)

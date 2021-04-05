@@ -590,8 +590,8 @@ public:
 			case GameMode::AddHighScore:
 				if (event.type == sf::Event::KeyPressed) {
 					sf::Keyboard::Key key = event.key.code;
+					const int nameLimit{ 13 };
 					char ch;
-					const int nameLimit{ 21 };
 
 					if (isLetter(key)) {
 						ch = 'a' + key;

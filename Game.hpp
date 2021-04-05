@@ -19,7 +19,6 @@
 #include "Direction.hpp"
 #include "Screen.hpp"
 #include "ScreensEnum.hpp"
-#include "LevelSelectionScreen.hpp"
 #include "GameScreen.hpp"
 #include "HighScoreTableScreen.hpp"
 #include "CreditsScreen.hpp"

@@ -35,9 +35,6 @@
     <ClInclude Include="MenuScreen.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="LevelSelectionScreen.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="HighScoreTableScreen.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
