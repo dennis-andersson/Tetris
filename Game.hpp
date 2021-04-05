@@ -29,11 +29,9 @@
 class Game
 {
 private:
-	sf::RenderWindow window;
 	const std::string windowTitle{ "Tetris" };
 	const int WindowWidth{ 500 };
 	const int WindowHeight{ 580 };
-	HighScoreTable highScores;
 	sf::Image titleBarIcon;
 	std::string volumeDataFile{ "volume.dat" };
 
@@ -64,6 +62,7 @@ public:
 		GameState::getInstance().Window.create(sf::VideoMode(WindowWidth, WindowHeight), windowTitle);
 		GameState::getInstance().Window.setFramerateLimit(60);
 		GameState::getInstance().Window.setIcon(titleBarIcon.getSize().x, titleBarIcon.getSize().y, titleBarIcon.getPixelsPtr());
+		GameState::getInstance().Window.setKeyRepeatEnabled(false);
 		GameState::getInstance().HighScoreTable.readHighScores();
 		GameState::getInstance().Sound.loadSoundEffects();
 		setVolumeLevel();
