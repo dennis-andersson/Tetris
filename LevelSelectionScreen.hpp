@@ -35,7 +35,6 @@ public:
 
 	ScreensEnum run()
 	{
-		GameState::getInstance().Sound.stopMenuMusic();
 		return ScreensEnum::Play;
 		//while (window.isOpen()) {
 		//	processInput(window);
