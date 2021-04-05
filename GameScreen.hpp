@@ -412,7 +412,7 @@ public:
 
 	void processEvents(sf::RenderWindow& window)
 	{
-		GamepadButtons button;
+		JoypadButtons button;
 		sf::Event event;
 		float position;
 
@@ -443,7 +443,7 @@ public:
 			}
 
 			if (event.type == sf::Event::JoystickButtonPressed)
-				button = gamepadButton(event.joystickButton.button);
+				button = joypadButton(event.joystickButton.button);
 
 			switch (mode.top()) {
 			case GameMode::Running:
@@ -497,18 +497,18 @@ public:
 					break;
 				case sf::Event::JoystickButtonPressed:
 					switch (button) {
-					case GamepadButtons::MenuB:
-					case GamepadButtons::ViewB:
+					case JoypadButtons::MenuB:
+					case JoypadButtons::ViewB:
 						pauseGame();
 						break;
-					case GamepadButtons::A:
-					case GamepadButtons::B:
-					case GamepadButtons::X:
-					case GamepadButtons::Y:
+					case JoypadButtons::A:
+					case JoypadButtons::B:
+					case JoypadButtons::X:
+					case JoypadButtons::Y:
 						rotateShape = true;
-						counterClockwise = (button == GamepadButtons::X || button == GamepadButtons::Y);
+						counterClockwise = (button == JoypadButtons::X || button == JoypadButtons::Y);
 						break;
-					case GamepadButtons::RightShoulder:
+					case JoypadButtons::RightShoulder:
 						rotateShape = rotateShape;
 						break;
 					}
@@ -561,7 +561,7 @@ public:
 						endGame = true;
 					break;
 				case sf::Event::JoystickButtonPressed:
-					if (button == GamepadButtons::MenuB || button == GamepadButtons::ViewB)
+					if (button == JoypadButtons::MenuB || button == JoypadButtons::ViewB)
 						pauseGame();
 					break;
 				}

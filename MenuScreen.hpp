@@ -111,7 +111,7 @@ public:
 					mouseClick(event.mouseButton.x, event.mouseButton.y);
 				break;
 			case sf::Event::JoystickButtonPressed:
-				if (gamepadButton(event.joystickButton.button) == GamepadButtons::A)
+				if (joypadButton(event.joystickButton.button) == JoypadButtons::A)
 					newScreen();
 				break;
 			case sf::Event::JoystickMoved:

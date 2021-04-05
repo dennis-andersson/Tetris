@@ -100,7 +100,7 @@ public:
 				break;
 			}
 		} else if (event.type == sf::Event::JoystickButtonPressed) {
-			if (gamepadButton(event.joystickButton.button) == GamepadButtons::B)
+			if (joypadButton(event.joystickButton.button) == JoypadButtons::B)
 				pressedBButton = true;
 		} else if (event.type == sf::Event::MouseButtonPressed) {
 			clickedOnBackButton = (event.mouseButton.button == sf::Mouse::Left && clickOnBackButton(event.mouseButton.x, event.mouseButton.y));
