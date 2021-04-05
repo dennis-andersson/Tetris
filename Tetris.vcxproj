@@ -176,6 +176,7 @@
     <ClInclude Include="Grid.hpp" />
     <ClInclude Include="HighScoreTable.hpp" />
     <ClInclude Include="HighScoreTableScreen.hpp" />
+    <ClInclude Include="Image.hpp" />
     <ClInclude Include="Input.hpp" />
     <ClInclude Include="Level.hpp" />
     <ClInclude Include="LevelSelectionScreen.hpp" />
