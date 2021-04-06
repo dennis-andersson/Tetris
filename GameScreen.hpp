@@ -56,7 +56,7 @@ private:
 	sf::Texture blockTextures;
 	std::vector<sf::Sprite> blocks;
 
-	//Direction direction;
+	Movement movement;
 	bool rotateShape{ false };
 	float dpadX, dpadY;
 	float limit{ 15.f };
@@ -88,7 +88,6 @@ private:
 
 	std::default_random_engine engine{ static_cast<unsigned int>(std::chrono::system_clock::now().time_since_epoch().count()) };
 
-	Movement movement;
 
 	std::unordered_map<sf::Keyboard::Key, Direction> table{
 		{sf::Keyboard::Left, Direction::Left},
@@ -496,11 +495,6 @@ public:
 						case sf::Keyboard::P:
 							pauseGame();
 							break;
-						case sf::Keyboard::A:
-							// DEBUG
-							currentScore.addSoftScore(1200);
-							currentLevel.nextLevel(currentScore.score);
-							break;
 						default:
 							Screen::processInput(event);
 							break;
@@ -531,10 +525,6 @@ public:
 						movement.source = InputSource::Joystick;
 						movement.direction = Direction::HardDrop;
 						return;
-						break;
-					case JoypadButtons::RightShoulder:
-						// DEBUG
-						rotateShape = rotateShape;
 						break;
 					}
 					break;
