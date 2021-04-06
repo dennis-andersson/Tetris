@@ -663,7 +663,6 @@ public:
 	{
 		GameState::getInstance().Sound.stopMenuMusic();
 		GameState::getInstance().Sound.playBackgroundMusic();
-		GameState::getInstance().Window.setKeyRepeatEnabled(false);
 
 		GameState::getInstance().Window.setMouseCursorVisible(false);
 		while (!endGame) {
@@ -672,7 +671,6 @@ public:
 		}
 		endGame = false;
 
-		GameState::getInstance().Window.setKeyRepeatEnabled(true);
 		GameState::getInstance().Sound.stopBackgroundMusic();
 		GameState::getInstance().Window.setMouseCursorVisible(true);
 
