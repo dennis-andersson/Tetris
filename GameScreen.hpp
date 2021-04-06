@@ -25,7 +25,7 @@
 
 enum class GameMode
 {
-	Running, RemovingLines, Paused, GameOver
+	Running, RemovingLines, Paused, GameOver, AddHighScore
 };
 
 class GameScreen : public Screen
@@ -81,6 +81,12 @@ private:
 	bool endGame{ false };
 	bool counterClockwise;
 
+	sf::RectangleShape addHighscoreBox;
+	TextElement addHighscoreMessage;
+	TextElement nameText;
+	std::string name;
+	bool addedHighScore{ false };
+
 	std::default_random_engine engine{ static_cast<unsigned int>(std::chrono::system_clock::now().time_since_epoch().count()) };
 
 	Movement movement;
@@ -89,7 +95,6 @@ private:
 		{sf::Keyboard::Left, Direction::Left},
 		{sf::Keyboard::Right, Direction::Right},
 		{sf::Keyboard::Down, Direction::SoftDown}
-//		,{sf::Keyboard::Up, Direction::Up}
 	};
 
 	std::unordered_map<sf::Event::EventType, InputSource> eventTypes{
@@ -198,6 +203,18 @@ public:
 		currentShape.setOffset(borderPosition);
 		newShape(currentShape, shapeFirstPosition);
 		newShape(nextShape, nextShapePosition);
+
+		// Add High score stuff
+		addHighscoreBox.setSize(sf::Vector2f(361,300));
+		addHighscoreBox.setPosition(sf::Vector2f(50, 100));
+		addHighscoreBox.setFillColor(sf::Color::Black);
+		addHighscoreBox.setOutlineColor(sf::Color::Red);
+		addHighscoreBox.setOutlineThickness(4.f);
+		sf::Vector2f addHighscoreMessagePosition{ 80, 130 };
+		sf::Vector2f nameTextPosition{ 105, 215 };
+		addHighscoreMessage.init("You've got a high score!\nPlease enter your name", addHighscoreMessagePosition, 25, textColor2, textStyle);
+		nameText.init(nameTextPosition, 25, textColor2, textStyle);
+		sf::FloatRect box{ addHighscoreMessage.getBoundingBox() };
 	}
 
 	sf::Sprite& getBlock(int blockId)
@@ -233,6 +250,12 @@ public:
 
 		// Draw text
 		drawTextElements(window);
+
+		if (mode.top() == GameMode::AddHighScore) {
+			window.draw(addHighscoreBox);
+			addHighscoreMessage.draw(window);
+			nameText.draw(window, name);
+		}
 
 		Screen::render(window);
 
@@ -287,38 +310,16 @@ public:
 				}
 				break;
 			case GameMode::Paused:
+			case GameMode::GameOver:
+			case GameMode::AddHighScore:
 				processEvents(window);
 				if (endGame) return;
 				update(deltaTime);
 				render(window);
 				break;
-			case GameMode::GameOver:
-				sf::Event event;
-
-				while (window.pollEvent(event)) {
-					if (event.type == sf::Event::Closed)
-						window.close();
-
-					if (event.type == sf::Event::JoystickButtonPressed) {
-						mode.pop();
-						return;
-					}
-
-					if (event.type == sf::Event::KeyPressed) {
-						if (event.key.code == sf::Keyboard::Escape)
-							endGame = true;
-						else
-							mode.pop();
-						return;
-					}
-				}
-
-				render(window);
-				break;
 			}
 		}
 	}
-
 
 	void update(const sf::Time& deltaTime)
 	{
@@ -326,6 +327,10 @@ public:
 
 		if (mode.top() == GameMode::Paused)
 			return;
+
+		if (mode.top() == GameMode::AddHighScore) {
+			return;
+		}
 
 		movement.update(deltaTime.asSeconds());
 
@@ -349,7 +354,11 @@ public:
 
 	void moveShape(Direction direction)
 	{
-		if (canMove(currentShape.getFutureBlockPositions(direction))) {
+		if (direction == Direction::HardDrop) {
+			while (canMove(currentShape.getFutureBlockPositions(Direction::Down)))
+				currentShape.move(Direction::Down);
+			moveShape(Direction::Down);
+		} else if (canMove(currentShape.getFutureBlockPositions(direction))) {
 			currentShape.move(direction);
 		} else {
 			if (movement.direction == Direction::Down || movement.direction == Direction::SoftDown) {
@@ -387,6 +396,11 @@ public:
 		mode.push(GameMode::GameOver);
 		gameOverText.setVisible(true);
 		makeRoomForText();
+
+		if (GameState::getInstance().HighScoreTable.isScoreHighEnough(currentScore.score) && !addedHighScore) {
+			mode.push(GameMode::AddHighScore);
+			addedHighScore = true;
+		}
 	}
 
 	void makeRoomForText()
@@ -412,7 +426,7 @@ public:
 
 	void processEvents(sf::RenderWindow& window)
 	{
-		GamepadButtons button;
+		JoypadButtons button;
 		sf::Event event;
 		float position;
 
@@ -443,7 +457,7 @@ public:
 			}
 
 			if (event.type == sf::Event::JoystickButtonPressed)
-				button = gamepadButton(event.joystickButton.button);
+				button = joypadButton(event.joystickButton.button);
 
 			switch (mode.top()) {
 			case GameMode::Running:
@@ -457,7 +471,12 @@ public:
 
 				switch (event.type) {
 				case sf::Event::KeyPressed:
-					if (table.contains(event.key.code)) {
+					if (event.key.code == sf::Keyboard::Down && event.key.control) {
+						movement.source = InputSource::Keyboard;
+						movement.direction = Direction::HardDrop;
+						movement.key = event.key.code;
+						return;
+					}else if (table.contains(event.key.code)) {
 						if (movement.direction != Direction::Down)
 							break;
 
@@ -497,18 +516,23 @@ public:
 					break;
 				case sf::Event::JoystickButtonPressed:
 					switch (button) {
-					case GamepadButtons::MenuB:
-					case GamepadButtons::ViewB:
+					case JoypadButtons::MenuB:
+					case JoypadButtons::ViewB:
 						pauseGame();
 						break;
-					case GamepadButtons::A:
-					case GamepadButtons::B:
-					case GamepadButtons::X:
-					case GamepadButtons::Y:
+					case JoypadButtons::A:
+					case JoypadButtons::B:
+					case JoypadButtons::X:
 						rotateShape = true;
-						counterClockwise = (button == GamepadButtons::X || button == GamepadButtons::Y);
+						counterClockwise = (button == JoypadButtons::X);
 						break;
-					case GamepadButtons::RightShoulder:
+					case JoypadButtons::Y:
+						movement.source = InputSource::Joystick;
+						movement.direction = Direction::HardDrop;
+						return;
+						break;
+					case JoypadButtons::RightShoulder:
+						// DEBUG
 						rotateShape = rotateShape;
 						break;
 					}
@@ -541,7 +565,6 @@ public:
 						movement.type = InputType::Dpad;
 						dpadY = event.joystickMove.position;
 						if (position < 0.5f)	movement.direction = Direction::SoftDown;
-						//if (position > 0.5f)	movement.direction = Direction::Up;
 						break;
 					default:
 						if (event.joystickMove.axis != sf::Joystick::Axis::X && event.joystickMove.axis != sf::Joystick::Axis::Y)
@@ -561,13 +584,68 @@ public:
 						endGame = true;
 					break;
 				case sf::Event::JoystickButtonPressed:
-					if (button == GamepadButtons::MenuB || button == GamepadButtons::ViewB)
+					if (button == JoypadButtons::MenuB || button == JoypadButtons::ViewB)
 						pauseGame();
 					break;
 				}
 				break;
+			case GameMode::GameOver:
+				if (event.type == sf::Event::JoystickButtonPressed) {
+					mode.pop();
+					return;
+				}
+
+				if (event.type == sf::Event::KeyPressed) {
+					if (event.key.code == sf::Keyboard::Escape)
+						endGame = true;
+					else
+						mode.pop();
+					return;
+				}
+				break;
+			case GameMode::AddHighScore:
+				if (event.type == sf::Event::KeyPressed) {
+					sf::Keyboard::Key key = event.key.code;
+					const int nameLimit{ 13 };
+					char ch;
+
+					if (isLetter(key)) {
+						ch = 'a' + key;
+						if (event.key.shift)
+							ch = std::toupper(ch);
+						if (name.size() < nameLimit)
+							name += ch;
+					} else if (isDigit(key)) {
+						ch = '0' + (key - sf::Keyboard::Num0);
+						if (name.size() < nameLimit)
+							name += ch;
+					} else if (key == sf::Keyboard::Space) {
+						if (name.size() < nameLimit)
+							name += ' ';
+					} else if (key == sf::Keyboard::Backspace) {
+						name.resize(name.size() - 1);
+					} else if (key == sf::Keyboard::Enter) {
+						if (name.size() > 0) {
+							GameState::getInstance().HighScoreTable.addHighScore(name, currentScore.score);
+							mode.pop();
+						}
+					} else if (key == sf::Keyboard::Escape) {
+						mode.pop();
+					}
+				}
+				break;
 			}
 		}
+	}
+
+	bool isDigit(sf::Keyboard::Key key)
+	{
+		return (key >= sf::Keyboard::Num0 && key <= sf::Keyboard::Num9);
+	}
+
+	bool isLetter(sf::Keyboard::Key key)
+	{
+		return (key >= sf::Keyboard::A && key <= sf::Keyboard::Z);
 	}
 
 	void rotate(bool ccw = true)
@@ -584,6 +662,7 @@ public:
 	{
 		GameState::getInstance().Sound.stopMenuMusic();
 		GameState::getInstance().Sound.playBackgroundMusic();
+		GameState::getInstance().Window.setKeyRepeatEnabled(false);
 
 		GameState::getInstance().Window.setMouseCursorVisible(false);
 		while (!endGame) {
@@ -592,8 +671,8 @@ public:
 		}
 		endGame = false;
 
+		GameState::getInstance().Window.setKeyRepeatEnabled(true);
 		GameState::getInstance().Sound.stopBackgroundMusic();
-
 		GameState::getInstance().Window.setMouseCursorVisible(true);
 
 		return ScreensEnum::Menu;
@@ -601,9 +680,11 @@ public:
 
 	void resetGame()
 	{
+		name = "";
 		mode.push(GameMode::Running);
 		movement.reset();
 		gameOverText.setVisible(false);
+		addedHighScore = false;
 		currentScore.score = 0;
 		currentLevel.reset();
 		linesCleared = 0;

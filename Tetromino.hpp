@@ -74,6 +74,11 @@ public:
 		return getBlockPositions(block, tempPosition);
 	}
 
+	sf::Vector2i getPosition()
+	{
+		return position;
+	}
+
 	void move(const Direction direction)
 	{
 		move(position, direction);

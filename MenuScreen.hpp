@@ -16,8 +16,8 @@ private:
 	sf::FloatRect menuOptionsBoundingBox;
 	sf::Color selectedOptionColor{ sf::Color::Yellow };
 	sf::Color nonSelectedOptionColor{ sf::Color::White };
-	static const int numberOfOptions{ 4 };
-	std::array<ScreensEnum, 4> choices{ ScreensEnum::LevelSelection, ScreensEnum::HighScores, ScreensEnum::Credits, ScreensEnum::None };
+	static const int numberOfOptions{ 5 };
+	std::array<ScreensEnum, numberOfOptions> choices{ ScreensEnum::Play, ScreensEnum::HighScores, ScreensEnum::Controls, ScreensEnum::Credits, ScreensEnum::None };
 	ScreensEnum chosenScreen;
 	bool selectedOption{ false };
 	int textSize{ 26 };
@@ -41,8 +41,9 @@ public:
 
 		options[0].init("Play", positions[0], textSize, nonSelectedOptionColor, sf::Text::Regular);
 		options[1].init("High scores", positions[1], textSize, nonSelectedOptionColor, sf::Text::Regular);
-		options[2].init("Credits", positions[2], textSize, nonSelectedOptionColor, sf::Text::Regular);
-		options[3].init("Quit", positions[3], textSize, nonSelectedOptionColor, sf::Text::Regular);
+		options[2].init("Controls", positions[2], textSize, nonSelectedOptionColor, sf::Text::Regular);
+		options[3].init("Credits", positions[3], textSize, nonSelectedOptionColor, sf::Text::Regular);
+		options[4].init("Quit", positions[4], textSize, nonSelectedOptionColor, sf::Text::Regular);
 
 		for (int i = 0; i < numberOfOptions; ++i)
 			options[i].setOriginToCenter();
@@ -110,7 +111,7 @@ public:
 					mouseClick(event.mouseButton.x, event.mouseButton.y);
 				break;
 			case sf::Event::JoystickButtonPressed:
-				if (gamepadButton(event.joystickButton.button) == GamepadButtons::A)
+				if (joypadButton(event.joystickButton.button) == JoypadButtons::A)
 					newScreen();
 				break;
 			case sf::Event::JoystickMoved:

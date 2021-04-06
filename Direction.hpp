@@ -1,5 +1,5 @@
 #pragma once
 
 enum class Direction {
-	None, Left, Right, Up, Down, SoftDown
+	None, Left, Right, Down, SoftDown, HardDrop
 };

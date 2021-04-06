@@ -166,9 +166,11 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AddHighScoreScreen.hpp" />
     <ClInclude Include="Background.hpp" />
     <ClInclude Include="Border.hpp" />
+    <ClInclude Include="ControllerMapScreen.hpp" />
+    <ClInclude Include="ControlsJoypad.hpp" />
+    <ClInclude Include="ControlsScreen.hpp" />
     <ClInclude Include="CreditsScreen.hpp" />
     <ClInclude Include="Direction.hpp" />
     <ClInclude Include="Game.hpp" />
@@ -176,9 +178,9 @@
     <ClInclude Include="Grid.hpp" />
     <ClInclude Include="HighScoreTable.hpp" />
     <ClInclude Include="HighScoreTableScreen.hpp" />
+    <ClInclude Include="Image.hpp" />
     <ClInclude Include="Input.hpp" />
     <ClInclude Include="Level.hpp" />
-    <ClInclude Include="LevelSelectionScreen.hpp" />
     <ClInclude Include="MenuScreen.hpp" />
     <ClInclude Include="GameScreen.hpp" />
     <ClInclude Include="resource.h" />

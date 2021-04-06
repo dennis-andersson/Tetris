@@ -8,6 +8,8 @@ Sounds/menu.ogg
 Sounds/music.ogg
 # Vim swap files
 *.swp
+# Game files
+*.dat
 
 # User-specific files
 *.rsuser

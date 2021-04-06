@@ -2,6 +2,6 @@
 
 enum class ScreensEnum
 {
-	Menu, LevelSelection, Play, HighScores, AddHighScore, Credits, None
+	Menu, Play, HighScores, Controls, Credits, None
 };
 

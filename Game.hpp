@@ -19,19 +19,16 @@
 #include "Direction.hpp"
 #include "Screen.hpp"
 #include "ScreensEnum.hpp"
-#include "LevelSelectionScreen.hpp"
 #include "GameScreen.hpp"
 #include "HighScoreTableScreen.hpp"
 #include "CreditsScreen.hpp"
-#include "AddHighScoreScreen.hpp"
 #include "GameState.hpp"
+#include "ControlsScreen.hpp"
 
 class Game
 {
 private:
 	const std::string windowTitle{ "Tetris" };
-	const int WindowWidth{ 500 };
-	const int WindowHeight{ 580 };
 	sf::Image titleBarIcon;
 	std::string volumeDataFile{ "volume.dat" };
 
@@ -59,20 +56,18 @@ public:
 	void Run()
 	{
 		titleBarIcon.loadFromFile("Icons/tetris.png");
-		GameState::getInstance().Window.create(sf::VideoMode(WindowWidth, WindowHeight), windowTitle);
+		GameState::getInstance().Window.create(sf::VideoMode(GameState::getInstance().WindowWidth, GameState::getInstance().WindowHeight), windowTitle);
 		GameState::getInstance().Window.setFramerateLimit(60);
 		GameState::getInstance().Window.setIcon(titleBarIcon.getSize().x, titleBarIcon.getSize().y, titleBarIcon.getPixelsPtr());
-		GameState::getInstance().Window.setKeyRepeatEnabled(false);
 		GameState::getInstance().HighScoreTable.readHighScores();
 		GameState::getInstance().Sound.loadSoundEffects();
 		setVolumeLevel();
 
 		MenuScreen menu;
 		GameScreen game;
-		LevelSelectionScreen levelSelection;
 		CreditsScreen credits;
 		HighScoreTableScreen highScoreTable;
-		AddHighScoreScreen addHighScoreScreen;
+		ControlsScreen controlsScreen;
 
 		ScreensEnum currentScreen = ScreensEnum::Menu;
 
@@ -82,13 +77,14 @@ public:
 				currentScreen = menu.run();
 				break;
 			case ScreensEnum::Play:
+				GameState::getInstance().Sound.stopMenuMusic();
 				currentScreen = game.run();
-				break;
-			case ScreensEnum::LevelSelection:
-				currentScreen = levelSelection.run();
 				break;
 			case ScreensEnum::HighScores:
 				currentScreen = highScoreTable.run();
+				break;
+			case ScreensEnum::Controls:
+				currentScreen = controlsScreen.run();
 				break;
 			case ScreensEnum::Credits:
 				currentScreen = credits.run();
