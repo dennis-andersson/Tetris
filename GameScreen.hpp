@@ -85,6 +85,7 @@ private:
 	TextElement addHighscoreMessage;
 	TextElement nameText;
 	std::string name;
+	bool addedHighScore{ false };
 
 	std::default_random_engine engine{ static_cast<unsigned int>(std::chrono::system_clock::now().time_since_epoch().count()) };
 
@@ -353,7 +354,11 @@ public:
 
 	void moveShape(Direction direction)
 	{
-		if (canMove(currentShape.getFutureBlockPositions(direction))) {
+		if (direction == Direction::HardDrop) {
+			while (canMove(currentShape.getFutureBlockPositions(Direction::Down)))
+				currentShape.move(Direction::Down);
+			moveShape(Direction::Down);
+		} else if (canMove(currentShape.getFutureBlockPositions(direction))) {
 			currentShape.move(direction);
 		} else {
 			if (movement.direction == Direction::Down || movement.direction == Direction::SoftDown) {
@@ -392,8 +397,9 @@ public:
 		gameOverText.setVisible(true);
 		makeRoomForText();
 
-		if (GameState::getInstance().HighScoreTable.isScoreHighEnough(currentScore.score)) {
+		if (GameState::getInstance().HighScoreTable.isScoreHighEnough(currentScore.score) && !addedHighScore) {
 			mode.push(GameMode::AddHighScore);
+			addedHighScore = true;
 		}
 	}
 
@@ -465,7 +471,12 @@ public:
 
 				switch (event.type) {
 				case sf::Event::KeyPressed:
-					if (table.contains(event.key.code)) {
+					if (event.key.code == sf::Keyboard::Down && event.key.control) {
+						movement.source = InputSource::Keyboard;
+						movement.direction = Direction::HardDrop;
+						movement.key = event.key.code;
+						return;
+					}else if (table.contains(event.key.code)) {
 						if (movement.direction != Direction::Down)
 							break;
 
@@ -512,11 +523,16 @@ public:
 					case JoypadButtons::A:
 					case JoypadButtons::B:
 					case JoypadButtons::X:
-					case JoypadButtons::Y:
 						rotateShape = true;
-						counterClockwise = (button == JoypadButtons::X || button == JoypadButtons::Y);
+						counterClockwise = (button == JoypadButtons::X);
+						break;
+					case JoypadButtons::Y:
+						movement.source = InputSource::Joystick;
+						movement.direction = Direction::HardDrop;
+						return;
 						break;
 					case JoypadButtons::RightShoulder:
+						// DEBUG
 						rotateShape = rotateShape;
 						break;
 					}
@@ -668,6 +684,7 @@ public:
 		mode.push(GameMode::Running);
 		movement.reset();
 		gameOverText.setVisible(false);
+		addedHighScore = false;
 		currentScore.score = 0;
 		currentLevel.reset();
 		linesCleared = 0;
