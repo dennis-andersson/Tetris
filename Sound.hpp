@@ -85,7 +85,9 @@ public:
 
 	void playMenuMusic()
 	{
-		if (menuMusic.getStatus() != sf::SoundSource::Status::Playing) {
+		if (menuMusic.getStatus() == sf::SoundSource::Status::Paused) {
+			menuMusic.play();
+		} else if (menuMusic.getStatus() != sf::SoundSource::Status::Playing) {
 			if (!menuMusic.openFromFile("Sounds/menu.ogg"))
 				return;
 			menuMusic.setLoop(true);
@@ -100,7 +102,9 @@ public:
 
 	void playBackgroundMusic()
 	{
-		if (backgroundMusic.getStatus() != sf::SoundSource::Status::Playing) {
+		if (backgroundMusic.getStatus() == sf::SoundSource::Status::Paused) {
+			backgroundMusic.play();
+		} else if (backgroundMusic.getStatus() != sf::SoundSource::Status::Playing) {
 			if (!backgroundMusic.openFromFile("Sounds/music.ogg"))
 				return;
 			backgroundMusic.setLoop(true);

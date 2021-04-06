@@ -684,14 +684,15 @@ public:
 
 	void pauseGame()
 	{
-		GameState::getInstance().Sound.pauseBackgroundMusic();
 		GameState::getInstance().Sound.playSoundEffect(SoundEffect::Pause);
 		if (mode.top() == GameMode::Paused) {
 			mode.pop();
 			grid.makeAllRowsVisible();
+			GameState::getInstance().Sound.playBackgroundMusic();
 		} else {
 			mode.push(GameMode::Paused);
 			makeRoomForText();
+			GameState::getInstance().Sound.pauseBackgroundMusic();
 		}
 		pausedText.toggleVisible();
 	}
