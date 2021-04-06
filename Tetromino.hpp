@@ -46,7 +46,7 @@ public:
 	{
 		if (!visible) return;
 
-		for (int i = 0; i < 4; ++i) {
+		for (int i = 0; i < blockLength; ++i) {
 			sprite.setPosition(offset.x + (block[i].x * 18) + (position.x * 18), offset.y + (block[i].y * 18) + (position.y * 18));
 			window.draw(sprite);
 		}
@@ -61,7 +61,7 @@ public:
 	{
 		std::array<sf::Vector2i, 4> blockPositions;
 
-		for (int i = 0; i < 4; ++i)
+		for (int i = 0; i < blockLength; ++i)
 			blockPositions[i] = sf::Vector2i{ Block[i].x + Position.x, Block[i].y + Position.y };
 
 		return blockPositions;
@@ -103,12 +103,12 @@ public:
 		//store state of Block in case rotation turns out to be invalid
 		oldBlock = block;
 
-		if (id == BlockNames::Square) // square: no need for rotation
+		if (id == BlockNames::Square) // Square: no need for rotation
 			return;
 
 		if (id == BlockNames::I) { // I: restrict "rotation" to two states (horizontal/vertical)
 			currentRotation++;
-			for (auto i = 0; i < 4; ++i) {
+			for (int i = 0; i < blockLength; ++i) {
 				sf::Vector2i oldPoint = block[i];    //pivot
 				sf::Vector2i localVector = oldPoint - sf::Vector2i{ 1, 2 };
 				sf::Vector2i nextPoint{};
@@ -125,7 +125,7 @@ public:
 			return;
 		}
 
-		for (auto i = 0; i < 4; ++i) {
+		for (int i = 0; i < blockLength; ++i) {
 			sf::Vector2i oldPoint = block[i];    //pivot
 			sf::Vector2i localVector = oldPoint - sf::Vector2i{ 1,2 };   // 1, 1
 

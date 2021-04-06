@@ -33,7 +33,6 @@ class GameScreen : public Screen
 private:
 	int WindowWidth;
 	int WindowHeight;
-	HighScoreTable highScores;
 	std::stack<GameMode> mode;
 
 	// Stack area
@@ -57,7 +56,7 @@ private:
 	sf::Texture blockTextures;
 	std::vector<sf::Sprite> blocks;
 
-	//Direction direction;
+	Movement movement;
 	bool rotateShape{ false };
 	float dpadX, dpadY;
 	float limit{ 15.f };
@@ -89,7 +88,6 @@ private:
 
 	std::default_random_engine engine{ static_cast<unsigned int>(std::chrono::system_clock::now().time_since_epoch().count()) };
 
-	Movement movement;
 
 	std::unordered_map<sf::Keyboard::Key, Direction> table{
 		{sf::Keyboard::Left, Direction::Left},
@@ -400,6 +398,8 @@ public:
 		if (GameState::getInstance().HighScoreTable.isScoreHighEnough(currentScore.score) && !addedHighScore) {
 			mode.push(GameMode::AddHighScore);
 			addedHighScore = true;
+		} else if (addedHighScore) {
+			resetGame();
 		}
 	}
 
@@ -495,11 +495,6 @@ public:
 						case sf::Keyboard::P:
 							pauseGame();
 							break;
-						case sf::Keyboard::A:
-							// DEBUG
-							currentScore.addSoftScore(1200);
-							currentLevel.nextLevel(currentScore.score);
-							break;
 						default:
 							Screen::processInput(event);
 							break;
@@ -530,10 +525,6 @@ public:
 						movement.source = InputSource::Joystick;
 						movement.direction = Direction::HardDrop;
 						return;
-						break;
-					case JoypadButtons::RightShoulder:
-						// DEBUG
-						rotateShape = rotateShape;
 						break;
 					}
 					break;
@@ -662,7 +653,6 @@ public:
 	{
 		GameState::getInstance().Sound.stopMenuMusic();
 		GameState::getInstance().Sound.playBackgroundMusic();
-		GameState::getInstance().Window.setKeyRepeatEnabled(false);
 
 		GameState::getInstance().Window.setMouseCursorVisible(false);
 		while (!endGame) {
@@ -671,7 +661,6 @@ public:
 		}
 		endGame = false;
 
-		GameState::getInstance().Window.setKeyRepeatEnabled(true);
 		GameState::getInstance().Sound.stopBackgroundMusic();
 		GameState::getInstance().Window.setMouseCursorVisible(true);
 
@@ -695,14 +684,15 @@ public:
 
 	void pauseGame()
 	{
-		GameState::getInstance().Sound.pauseBackgroundMusic();
 		GameState::getInstance().Sound.playSoundEffect(SoundEffect::Pause);
 		if (mode.top() == GameMode::Paused) {
 			mode.pop();
 			grid.makeAllRowsVisible();
+			GameState::getInstance().Sound.playBackgroundMusic();
 		} else {
 			mode.push(GameMode::Paused);
 			makeRoomForText();
+			GameState::getInstance().Sound.pauseBackgroundMusic();
 		}
 		pausedText.toggleVisible();
 	}
