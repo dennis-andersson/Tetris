@@ -33,7 +33,6 @@ class GameScreen : public Screen
 private:
 	int WindowWidth;
 	int WindowHeight;
-	HighScoreTable highScores;
 	std::stack<GameMode> mode;
 
 	// Stack area
@@ -400,6 +399,8 @@ public:
 		if (GameState::getInstance().HighScoreTable.isScoreHighEnough(currentScore.score) && !addedHighScore) {
 			mode.push(GameMode::AddHighScore);
 			addedHighScore = true;
+		} else if (addedHighScore) {
+			resetGame();
 		}
 	}
 
