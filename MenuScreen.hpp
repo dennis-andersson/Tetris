@@ -192,31 +192,6 @@ public:
 		}
 	}
 
-	void drawBoundingBoxes(sf::RenderWindow& window)
-	{
-		for (int i = 0; i < numberOfOptions; ++i) {
-			sf::FloatRect boundingBox{ options[i].getBoundingBox() };
-			sf::Vector2f position{ boundingBox.left, boundingBox.top };
-			sf::Vector2f size{ boundingBox.width, boundingBox.height };
-			sf::RectangleShape rect{ size };
-			rect.setPosition(position);
-			rect.setOutlineThickness(2.f);
-			rect.setOutlineColor(sf::Color::Red);
-			rect.setFillColor(sf::Color::Transparent);
-			window.draw(rect);
-		}
-
-		sf::FloatRect boundingBox{ getMenuBoundingBox() };
-		sf::Vector2f position{ boundingBox.left, boundingBox.top };
-		sf::Vector2f size{ boundingBox.width, boundingBox.height };
-		sf::RectangleShape rect{ size };
-		rect.setPosition(position);
-		rect.setOutlineThickness(2.f);
-		rect.setOutlineColor(sf::Color::Red);
-		rect.setFillColor(sf::Color::Transparent);
-		window.draw(rect);
-	}
-
 	void render(sf::RenderWindow& window)
 	{
 		window.clear();
@@ -227,9 +202,6 @@ public:
 
 		for (int i = 0; i < numberOfOptions; ++i)
 			options[i].draw(window);
-
-		if (false)
-			drawBoundingBoxes(window);
 
 		Screen::render(window);
 		window.display();

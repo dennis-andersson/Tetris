@@ -374,8 +374,7 @@ public:
 					if (mode.top() == GameMode::RemovingLines)
 						X++;
 					mode.push(GameMode::RemovingLines);
-				}
-				else {
+				} else {
 					GameState::getInstance().Sound.playSoundEffect(SoundEffect::SoftDrop);
 					newShapes();
 					if (!canMove(currentShape.getBlockPositions()))
